@@ -1,7 +1,10 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header'
+import PageLoading from './components/common/PageLoading'
+import { ROUTES, getPageKeyFromPath } from './config/routes'
 
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const CashierPage = lazy(() => import('./pages/CashierPage'))
@@ -14,18 +17,14 @@ const CustomersPage = lazy(() => import('./pages/CustomersPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
 
 function PageFallback() {
-    return (
-        <div className="flex-center" style={{ minHeight: '40vh' }}>
-            <div className="spinner"></div>
-        </div>
-    )
+    return <PageLoading compact />
 }
 
-function AppContent() {
-    const { isAuthenticated, loading } = useAuth()
-    const [currentPage, setCurrentPage] = useState('cashier')
+function AuthenticatedShell() {
+    const location = useLocation()
     const [cart, setCart] = useState([])
     const [products, setProducts] = useState([])
+    const currentPage = getPageKeyFromPath(location.pathname)
 
     // Sidebar collapsed state - synced with Header
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -34,10 +33,8 @@ function AppContent() {
     })
 
     useEffect(() => {
-        if (isAuthenticated) {
-            fetchProducts()
-        }
-    }, [isAuthenticated])
+        fetchProducts()
+    }, [])
 
     const fetchProducts = async () => {
         try {
@@ -102,60 +99,15 @@ function AppContent() {
     // Show loading
     if (loading) {
         return (
-            <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="app app-loading-shell">
                 <div className="spinner"></div>
             </div>
         )
     }
 
-    // Show login if not authenticated
-    if (!isAuthenticated) {
-        return (
-            <Suspense fallback={<PageFallback />}>
-                <LoginPage />
-            </Suspense>
-        )
-    }
-
-    const renderPage = () => {
-        switch (currentPage) {
-            case 'cashier':
-                return (
-                    <CashierPage
-                        products={products}
-                        cart={cart}
-                        cartTotal={cartTotal}
-                        cartCount={cartCount}
-                        addToCart={addToCart}
-                        updateQuantity={updateQuantity}
-                        clearCart={clearCart}
-                        fetchProducts={fetchProducts}
-                    />
-                )
-            case 'admin':
-                return <AdminPage products={products} onProductsChange={fetchProducts} />
-            case 'inventory':
-                return <InventoryPage />
-            case 'discounts':
-                return <DiscountsPage />
-            case 'reports':
-                return <ReportsPage />
-            case 'history':
-                return <HistoryPage />
-            case 'customers':
-                return <CustomersPage />
-            case 'users':
-                return <UsersPage />
-            default:
-                return null
-        }
-    }
-
     return (
         <div className="app">
             <Header
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
                 cartCount={cartCount}
                 sidebarCollapsed={sidebarCollapsed}
                 onSidebarToggle={setSidebarCollapsed}
@@ -163,7 +115,17 @@ function AppContent() {
             <div className={`app-content page-${currentPage} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
                 <main className={`main-content page-${currentPage}`}>
                     <Suspense fallback={<PageFallback />}>
-                        {renderPage()}
+                        <Routes>
+                            <Route path={ROUTES.cashier} element={<CashierPage products={products} cart={cart} cartTotal={cartTotal} cartCount={cartCount} addToCart={addToCart} updateQuantity={updateQuantity} clearCart={clearCart} fetchProducts={fetchProducts} />} />
+                            <Route path={ROUTES.products} element={<AdminPage products={products} onProductsChange={fetchProducts} />} />
+                            <Route path={ROUTES.inventory} element={<InventoryPage />} />
+                            <Route path={ROUTES.discounts} element={<DiscountsPage />} />
+                            <Route path={ROUTES.reports} element={<ReportsPage />} />
+                            <Route path={ROUTES.history} element={<HistoryPage />} />
+                            <Route path={ROUTES.customers} element={<CustomersPage />} />
+                            <Route path={ROUTES.users} element={<UsersPage />} />
+                            <Route path="*" element={<Navigate to={ROUTES.cashier} replace />} />
+                        </Routes>
                     </Suspense>
                 </main>
             </div>
@@ -171,11 +133,34 @@ function AppContent() {
     )
 }
 
+function AppContent() {
+    const { isAuthenticated, loading } = useAuth()
+
+    if (loading) {
+        return <div className="app app-loading-shell"><div className="spinner"></div></div>
+    }
+
+    return (
+        <Routes>
+            <Route
+                path={ROUTES.login}
+                element={isAuthenticated ? <Navigate to={ROUTES.cashier} replace /> : <Suspense fallback={<PageFallback />}><LoginPage /></Suspense>}
+            />
+            <Route
+                path="/*"
+                element={isAuthenticated ? <AuthenticatedShell /> : <Navigate to={ROUTES.login} replace />}
+            />
+        </Routes>
+    )
+}
+
 function App() {
     return (
         <ThemeProvider>
             <AuthProvider>
-                <AppContent />
+                <BrowserRouter>
+                    <AppContent />
+                </BrowserRouter>
             </AuthProvider>
         </ThemeProvider>
     )

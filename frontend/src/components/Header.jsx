@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ROUTES, getNavItems } from '../config/routes'
 import {
     ShoppingCart,
     Package,
@@ -17,13 +19,14 @@ import {
     LogOut,
     ChevronLeft,
     ChevronRight,
-    Menu,
     X
 } from 'lucide-react'
 
-function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSidebarToggle }) {
+function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
     const { user, logout, isAdmin } = useAuth()
     const { toggleTheme, isDark } = useTheme()
+    const location = useLocation()
+    const navigate = useNavigate()
 
     // Mobile menu state
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -35,21 +38,21 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
         }
     }, [sidebarCollapsed])
 
-    const navItems = [
-        { id: 'cashier', label: 'Kasir', icon: ShoppingCart },
-        ...(isAdmin ? [
-            { id: 'admin', label: 'Produk', icon: Package },
-            { id: 'inventory', label: 'Stok', icon: BarChart3 },
-            { id: 'customers', label: 'Pelanggan', icon: Users },
-            { id: 'users', label: 'User', icon: UserCog },
-            { id: 'discounts', label: 'Diskon', icon: Tag },
-            { id: 'reports', label: 'Laporan', icon: TrendingUp },
-        ] : []),
-        { id: 'history', label: 'Riwayat', icon: History },
-    ]
+    const iconMap = {
+        cashier: ShoppingCart,
+        products: Package,
+        inventory: BarChart3,
+        customers: Users,
+        users: UserCog,
+        discounts: Tag,
+        reports: TrendingUp,
+        history: History,
+    }
 
-    const handleNavClick = (pageId) => {
-        onPageChange(pageId)
+    const navItems = getNavItems(isAdmin)
+
+    const handleNavClick = (path) => {
+        navigate(path)
         setMobileMenuOpen(false) // Close mobile menu after navigation
     }
 
@@ -69,7 +72,7 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
             <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 {/* Sidebar Header */}
                 <div className="sidebar-header">
-                    <div className="sidebar-logo clickable-logo" onClick={() => onPageChange('cashier')}>
+                    <div className="sidebar-logo clickable-logo" onClick={() => navigate(ROUTES.cashier)}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
@@ -87,19 +90,19 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
                 {/* Sidebar Navigation Items */}
                 <nav className="sidebar-nav">
                     {navItems.map(item => {
-                        const IconComponent = item.icon
+                        const IconComponent = iconMap[item.icon]
                         return (
                             <button
-                                key={item.id}
-                                className={`sidebar-nav-item ${currentPage === item.id ? 'active' : ''}`}
-                                onClick={() => handleNavClick(item.id)}
+                                key={item.key}
+                                className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={() => handleNavClick(item.path)}
                                 title={sidebarCollapsed ? item.label : ''}
                             >
                                 <span className="nav-icon">
                                     <IconComponent size={20} strokeWidth={2} />
                                 </span>
                                 <span className="nav-label">{item.label}</span>
-                                {item.id === 'cashier' && cartCount > 0 && (
+                                {item.key === 'cashier' && cartCount > 0 && (
                                     <span className="cart-badge">{cartCount}</span>
                                 )}
                             </button>
@@ -155,7 +158,7 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
                         <span className="hamburger-line"></span>
                     </button>
 
-                    <div className="logo clickable-logo" onClick={() => onPageChange('cashier')}>
+                    <div className="logo clickable-logo" onClick={() => navigate(ROUTES.cashier)}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
@@ -196,18 +199,18 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
                         {/* Menu Items */}
                         <nav className="mobile-menu-nav">
                             {navItems.map(item => {
-                                const IconComponent = item.icon
+                                const IconComponent = iconMap[item.icon]
                                 return (
                                     <button
-                                        key={item.id}
-                                        className={`mobile-menu-item ${currentPage === item.id ? 'active' : ''}`}
-                                        onClick={() => handleNavClick(item.id)}
+                                        key={item.key}
+                                        className={`mobile-menu-item ${location.pathname === item.path ? 'active' : ''}`}
+                                        onClick={() => handleNavClick(item.path)}
                                     >
                                         <span className="nav-icon">
                                             <IconComponent size={20} strokeWidth={2} />
                                         </span>
                                         <span className="nav-label">{item.label}</span>
-                                        {item.id === 'cashier' && cartCount > 0 && (
+                                        {item.key === 'cashier' && cartCount > 0 && (
                                             <span className="cart-badge">{cartCount}</span>
                                         )}
                                     </button>
