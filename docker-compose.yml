@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    build: ./backend-go
     container_name: kasir-backend
     ports:
       - "8765:8000"
@@ -10,7 +10,9 @@ services:
       - ./backend/kasir.db:/app/kasir.db
       - ./backend/uploads:/app/uploads
     environment:
-      - PYTHONUNBUFFERED=1
+      - PORT=8000
+      - DB_PATH=kasir.db
+      - UPLOAD_DIR=uploads
     restart: unless-stopped
     networks:
       - kasir-network

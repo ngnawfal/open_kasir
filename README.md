@@ -1,6 +1,6 @@
 # 🛒 Sistem Kasir - Toko Makanan
 
-Sistem kasir modern dengan fitur lengkap untuk toko retail/makanan. Dibangun dengan React + Vite (Frontend) dan Python FastAPI (Backend).
+Sistem kasir modern dengan fitur lengkap untuk toko retail/makanan. Dibangun dengan React + Vite (Frontend) dan Go (Backend).
 
 ![Sistem Kasir](https://via.placeholder.com/800x400?text=Sistem+Kasir+Toko+Makanan)
 
@@ -40,7 +40,7 @@ graph TB
         J --> K[Payment Processing]
     end
     
-    subgraph "Backend - FastAPI"
+    subgraph "Backend - Go API"
         L[API Gateway]
         L --> M[Auth Routes]
         L --> N[Product Routes]
@@ -139,29 +139,31 @@ cd program_kasir
 # Atau download dan extract ZIP
 ```
 
-### 2️⃣ Setup Backend (Python FastAPI)
+### 2️⃣ Setup Backend (Go)
 
 ```bash
-# Masuk ke folder backend
-cd backend
-
-# Buat virtual environment (disarankan)
-python -m venv venv
-
-# Aktifkan virtual environment
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
+# Masuk ke folder backend-go
+cd backend-go
 
 # Install dependencies
-pip install -r requirements.txt
+go mod tidy
 
 # Jalankan server backend
-python -m uvicorn main:app --reload --port 8000
+go run ./cmd/server
 ```
 
 Backend akan berjalan di: **http://localhost:8000**
+
+### 📌 Status Migrasi Backend
+
+Backend aktif sekarang sudah disiapkan di folder **`backend-go/`**.
+
+- `backend-go/` → backend Go baru
+- `backend/` → backend Python lama yang dipertahankan sebagai referensi + sumber data SQLite lama
+
+Lihat detail migrasi, asumsi kompatibilitas, hasil verifikasi, dan langkah cutover di:
+
+- **[`backend-go/MIGRATION_STATUS.md`](backend-go/MIGRATION_STATUS.md)**
 
 ### 3️⃣ Setup Frontend (React + Vite)
 
@@ -203,24 +205,16 @@ Buka browser dan akses: **http://localhost:5173** (development) atau **http://lo
 
 ```
 program_kasir/
-├── backend/                 # Python FastAPI Backend
-│   ├── main.py             # Entry point & app initialization
-│   ├── database.py         # SQLite database config
-│   ├── models.py           # SQLAlchemy models
-│   ├── auth.py             # JWT authentication
-│   ├── requirements.txt    # Python dependencies
-│   ├── kasir.db           # SQLite database with demo data
-│   ├── .env.example       # Environment variables template
-│   ├── uploads/           # Product images (included for demo)
-│   └── routes/
-│       ├── auth.py         # Auth endpoints
-│       ├── products.py     # Product endpoints
-│       ├── transactions.py # Transaction endpoints
-│       ├── discounts.py    # Discount endpoints
-│       ├── reports.py      # Report endpoints
-│       ├── customers.py    # Customer endpoints
-│       ├── export.py       # Export endpoints
-│       └── users.py        # User management endpoints
+├── backend-go/             # Go backend replacement
+│   ├── cmd/server/         # Entry point
+│   ├── internal/           # API, config, db, models, handlers
+│   ├── uploads/            # Upload directory for local dev
+│   ├── go.mod              # Go module definition
+│   └── Dockerfile          # Container build for backend
+│
+├── backend/                # Legacy Python backend reference + existing SQLite data
+│   ├── kasir.db            # SQLite database with demo data
+│   └── uploads/            # Product images / persisted assets
 │
 ├── frontend/               # React + Vite Frontend
 │   ├── package.json       # Node.js dependencies
