@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import AccessDenied from '../components/common/AccessDenied'
 import PageLoading from '../components/common/PageLoading'
 import DiscountsToolbar from '../components/discounts/DiscountsToolbar'
@@ -8,6 +9,7 @@ import DiscountFormModal from '../components/discounts/DiscountFormModal'
 
 function DiscountsPage() {
     const { authFetch, isAdmin } = useAuth()
+    const { notify, confirm } = useUI()
     const [discounts, setDiscounts] = useState([])
     const [loading, setLoading] = useState(true)
     const [showForm, setShowForm] = useState(false)
@@ -68,10 +70,10 @@ function DiscountsPage() {
                 resetForm()
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menyimpan diskon', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menyimpan diskon', message: error.message })
         }
     }
 
@@ -91,7 +93,7 @@ function DiscountsPage() {
     }
 
     const handleDelete = async (id) => {
-        if (!confirm('Hapus diskon ini?')) return
+        if (!(await confirm({ title: 'Hapus diskon?', description: 'Diskon yang dihapus tidak bisa dipakai lagi.', confirmText: 'Hapus', tone: 'danger' }))) return
 
         try {
             const response = await authFetch(`/api/discounts/${id}`, { method: 'DELETE' })

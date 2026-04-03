@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import PageLoading from '../components/common/PageLoading'
 import CustomersSummaryCards from '../components/customers/CustomersSummaryCards'
 import CustomersToolbar from '../components/customers/CustomersToolbar'
@@ -8,6 +9,7 @@ import CustomerFormModal from '../components/customers/CustomerFormModal'
 
 function CustomersPage() {
     const { authFetch } = useAuth()
+    const { notify, prompt } = useUI()
     const [customers, setCustomers] = useState([])
     const [loading, setLoading] = useState(true)
     const [showForm, setShowForm] = useState(false)
@@ -57,10 +59,10 @@ function CustomersPage() {
                 resetForm()
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menyimpan pelanggan', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menyimpan pelanggan', message: error.message })
         }
     }
 
@@ -82,7 +84,13 @@ function CustomersPage() {
     }
 
     const handlePayDebt = async (customerId, debtId) => {
-        const amount = prompt('Masukkan jumlah pembayaran:')
+        const amount = await prompt({
+            title: 'Pembayaran hutang',
+            description: 'Masukkan jumlah pembayaran pelanggan.',
+            placeholder: 'Jumlah pembayaran',
+            inputType: 'number',
+            confirmText: 'Bayar',
+        })
         if (!amount) return
 
         try {
@@ -92,13 +100,13 @@ function CustomersPage() {
             })
             if (response.ok) {
                 loadCustomers()
-                alert('Pembayaran berhasil!')
+                notify({ type: 'success', title: 'Pembayaran berhasil', message: 'Hutang pelanggan berhasil dibayar.' })
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Pembayaran gagal', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Pembayaran gagal', message: error.message })
         }
     }
 
