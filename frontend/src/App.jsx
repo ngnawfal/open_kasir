@@ -147,8 +147,8 @@ function AppContent() {
                 sidebarCollapsed={sidebarCollapsed}
                 onSidebarToggle={setSidebarCollapsed}
             />
-            <div className={`app-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-                <main className="main-content">
+            <div className={`app-content page-${currentPage} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+                <main className={`main-content page-${currentPage}`}>
                     {renderPage()}
                 </main>
             </div>

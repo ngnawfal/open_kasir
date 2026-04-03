@@ -69,7 +69,7 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
             <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 {/* Sidebar Header */}
                 <div className="sidebar-header">
-                    <div className="sidebar-logo" onClick={() => onPageChange('cashier')} style={{ cursor: 'pointer' }}>
+                    <div className="sidebar-logo clickable-logo" onClick={() => onPageChange('cashier')}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
@@ -155,7 +155,7 @@ function Header({ currentPage, onPageChange, cartCount, sidebarCollapsed, onSide
                         <span className="hamburger-line"></span>
                     </button>
 
-                    <div className="logo" onClick={() => onPageChange('cashier')} style={{ cursor: 'pointer' }}>
+                    <div className="logo clickable-logo" onClick={() => onPageChange('cashier')}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
