@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { BrowserMultiFormatReader } from '@zxing/library'
 import AccessDenied from '../components/common/AccessDenied'
 import ProductListSection from '../components/admin/ProductListSection'
@@ -10,6 +11,7 @@ import ProductBarcodeManagerModal from '../components/admin/ProductBarcodeManage
 
 function AdminPage({ products, onProductsChange }) {
     const { authFetch, isAdmin } = useAuth()
+    const { notify, confirm } = useUI()
     const [showForm, setShowForm] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [barcodeImage, setBarcodeImage] = useState(null)
@@ -107,15 +109,15 @@ function AdminPage({ products, onProductsChange }) {
                 resetForm()
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menyimpan produk', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menyimpan produk', message: error.message })
         }
     }
 
     const handleDelete = async (productId) => {
-        if (!confirm('Hapus produk ini?')) return
+        if (!(await confirm({ title: 'Hapus produk?', description: 'Produk yang dihapus tidak akan tampil di daftar aktif.', confirmText: 'Hapus', tone: 'danger' }))) return
 
         try {
             const response = await authFetch(`/api/products/${productId}`, {
@@ -298,10 +300,10 @@ function AdminPage({ products, onProductsChange }) {
                 onProductsChange() // Refresh product list
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menambah barcode', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menambah barcode', message: error.message })
         }
     }
 
@@ -415,20 +417,20 @@ function AdminPage({ products, onProductsChange }) {
 
             if (response.ok) {
                 onProductsChange()
-                alert('Gambar berhasil diupload!')
+                notify({ type: 'success', title: 'Upload berhasil', message: 'Gambar produk berhasil diperbarui' })
             } else {
                 const error = await response.json()
-                alert(error.detail || 'Gagal upload gambar')
+                notify({ type: 'error', title: 'Upload gagal', message: error.detail || 'Gagal upload gambar' })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Upload gagal', message: error.message })
         } finally {
             setUploading(false)
         }
     }
 
     const handleDeleteImage = async (productId) => {
-        if (!confirm('Hapus gambar produk ini?')) return
+        if (!(await confirm({ title: 'Hapus gambar?', description: 'Gambar produk akan dihapus permanen.', confirmText: 'Hapus', tone: 'danger' }))) return
 
         try {
             const response = await authFetch(`/api/products/${productId}/image`, {

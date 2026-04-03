@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { PageTitle } from '../components/PageTitle'
 import AccessDenied from '../components/common/AccessDenied'
 import PageLoading from '../components/common/PageLoading'
 
 function InventoryPage() {
     const { authFetch, isAdmin } = useAuth()
+    const { notify } = useUI()
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const [showAdjustModal, setShowAdjustModal] = useState(false)
@@ -66,10 +68,10 @@ function InventoryPage() {
                 setShowAdjustModal(false)
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menyesuaikan stok', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menyesuaikan stok', message: error.message })
         }
     }
 
