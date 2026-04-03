@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import BarcodeScanner from '../components/BarcodeScanner'
-import Cart from '../components/Cart'
 import CheckoutModal from '../components/CheckoutModal'
 import { useAuth } from '../context/AuthContext'
 
@@ -62,62 +61,88 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
     }
 
     const formatRupiah = (amount) => `Rp ${amount.toLocaleString('id-ID')}`
+    const lowStockCount = products.filter(product => product.stock > 0 && product.stock <= 5).length
+    const availableCount = products.filter(product => product.stock > 0).length
 
     return (
-        <div className="cashier-page">
-            {/* Left Panel - Products */}
-            <div className="cashier-products-panel">
-                {/* Header with Search */}
-                <div className="cashier-header">
-                    <div className="cashier-search">
-                        <span className="search-icon">🔍</span>
+        <div className="cashier-page cashier-shell">
+            <div className="cashier-products-panel cashier-products-surface">
+                <div className="cashier-hero">
+                    <div>
+                        <span className="cashier-kicker">Operator Workspace</span>
+                        <h1 className="cashier-title">Kasir Cepat & Fokus</h1>
+                        <p className="cashier-subtitle">
+                            Cari produk, scan barcode, lalu selesaikan pembayaran tanpa pindah alur.
+                        </p>
+                    </div>
+                    <div className="cashier-hero-stats">
+                        <div className="cashier-stat-card">
+                            <span className="cashier-stat-label">Produk aktif</span>
+                            <strong>{availableCount}</strong>
+                        </div>
+                        <div className="cashier-stat-card warning">
+                            <span className="cashier-stat-label">Stok menipis</span>
+                            <strong>{lowStockCount}</strong>
+                        </div>
+                        <div className="cashier-stat-card accent">
+                            <span className="cashier-stat-label">Item di keranjang</span>
+                            <strong>{cartCount}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {scanStatus && (
+                    <div className={`status-toast ${scanStatus.type} cashier-status-pill`}>
+                        <span className="cashier-status-dot" />
+                        <span>{scanStatus.message}</span>
+                    </div>
+                )}
+
+                <div className="cashier-toolbar">
+                    <div className="cashier-search search-elevated">
+                        <span className="search-icon">🔎</span>
                         <input
                             type="text"
-                            placeholder="Cari produk atau scan barcode..."
+                            placeholder="Cari nama menu atau barcode..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="cashier-search-input"
                         />
                     </div>
                     <button
-                        className={`btn-scan ${isScanning ? 'active' : ''}`}
+                        className={`btn-scan cashier-scan-btn ${isScanning ? 'active' : ''}`}
                         onClick={() => setIsScanning(!isScanning)}
                     >
-                        📷 {isScanning ? 'Stop' : 'Scan'}
+                        <span>📷</span>
+                        <span>{isScanning ? 'Tutup Scanner' : 'Scan Barcode'}</span>
                     </button>
                 </div>
 
-
-
-                {/* Status Toast */}
-                {scanStatus && (
-                    <div className={`status-toast ${scanStatus.type}`}>
-                        {scanStatus.message}
+                <div className="cashier-filter-row">
+                    <div className="category-tabs cashier-category-tabs">
+                        {categories.map(cat => (
+                            <button
+                                key={cat}
+                                className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
+                                onClick={() => setActiveCategory(cat)}
+                            >
+                                {cat}
+                            </button>
+                        ))}
                     </div>
-                )}
-
-                {/* Category Tabs */}
-                <div className="category-tabs">
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            className={`category-tab ${activeCategory === cat ? 'active' : ''}`}
-                            onClick={() => setActiveCategory(cat)}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                    <div className="cashier-filter-meta">
+                        <span>{filteredProducts.length} produk tampil</span>
+                        <span>{activeCategory}</span>
+                    </div>
                 </div>
 
-                {/* Products Grid */}
-                <div className="products-grid">
+                <div className="products-grid cashier-products-grid">
                     {filteredProducts.map(product => (
                         <div
                             key={product.id}
-                            className={`product-card ${product.stock <= 0 ? 'out-of-stock' : ''}`}
+                            className={`product-card cashier-product-card ${product.stock <= 0 ? 'out-of-stock' : ''}`}
                             onClick={() => handleAddToCart(product)}
                         >
-                            {/* Product Image or Emoji */}
                             <div className="product-card-image">
                                 {product.image_url ? (
                                     <img src={product.image_url} alt={product.name} />
@@ -132,32 +157,50 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
                                 )}
                             </div>
                             <div className="product-card-info">
-                                <span className="product-card-name">{product.name}</span>
-                                <span className="product-card-price">{formatRupiah(product.price)}</span>
+                                <div className="cashier-product-head">
+                                    <span className="product-card-name">{product.name}</span>
+                                    <span className="cashier-product-category">{product.category}</span>
+                                </div>
+                                <div className="cashier-product-footer">
+                                    <span className="product-card-price">{formatRupiah(product.price)}</span>
+                                    <span className="cashier-product-stock">Stok {product.stock}</span>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Right Panel - Cart */}
-            <div className="cashier-cart-panel">
+            <div className="cashier-cart-panel cashier-cart-surface">
                 <div className="cart-header">
-                    <h2>🛒 Keranjang</h2>
+                    <div>
+                        <span className="cashier-kicker">Ringkasan transaksi</span>
+                        <h2>🛒 Keranjang</h2>
+                    </div>
                     <span className="cart-count">{cartCount} item</span>
                 </div>
 
-                {/* Cart Items */}
-                <div className="cart-items">
+                <div className="cashier-cart-summary">
+                    <div>
+                        <span className="cashier-summary-label">Total sementara</span>
+                        <strong>{formatRupiah(cartTotal)}</strong>
+                    </div>
+                    <div>
+                        <span className="cashier-summary-label">Kategori dipilih</span>
+                        <strong>{activeCategory}</strong>
+                    </div>
+                </div>
+
+                <div className="cart-items cashier-cart-items">
                     {cart.length === 0 ? (
-                        <div className="cart-empty">
+                        <div className="cart-empty cashier-cart-empty-state">
                             <span className="cart-empty-icon">🛒</span>
                             <p>Keranjang kosong</p>
-                            <small>Klik produk untuk menambahkan</small>
+                            <small>Tambahkan produk dari panel kiri atau scan barcode</small>
                         </div>
                     ) : (
                         cart.map(item => (
-                            <div key={item.id} className="cart-item">
+                            <div key={item.id} className="cart-item cashier-cart-item-card">
                                 <div className="cart-item-info">
                                     {item.image_url ? (
                                         <img src={item.image_url} alt={item.name} className="cart-item-img" />
@@ -169,35 +212,40 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
                                         <div className="cart-item-price">{formatRupiah(item.price)}</div>
                                     </div>
                                 </div>
-                                <div className="cart-item-qty">
-                                    <button
-                                        className="qty-btn"
-                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                    >
-                                        −
-                                    </button>
-                                    <span className="qty-value">{item.quantity}</span>
-                                    <button
-                                        className="qty-btn"
-                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                                <div className="cart-item-subtotal">
-                                    {formatRupiah(item.price * item.quantity)}
+                                <div className="cashier-cart-side">
+                                    <div className="cart-item-qty cashier-qty-control">
+                                        <button
+                                            className="qty-btn"
+                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        >
+                                            −
+                                        </button>
+                                        <span className="qty-value">{item.quantity}</span>
+                                        <button
+                                            className="qty-btn"
+                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                    <div className="cart-item-subtotal">
+                                        {formatRupiah(item.price * item.quantity)}
+                                    </div>
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
 
-                {/* Cart Footer */}
-                <div className="cart-footer">
+                <div className="cart-footer cashier-cart-footer">
                     <div className="cart-total">
                         <span>Total</span>
                         <span className="cart-total-amount">{formatRupiah(cartTotal)}</span>
                     </div>
+
+                    <p className="cashier-cart-note">
+                        Pastikan jumlah item benar sebelum lanjut ke pembayaran.
+                    </p>
 
                     <div className="cart-actions">
                         {cart.length > 0 && (
@@ -216,13 +264,15 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
                 </div>
             </div>
 
-            {/* Scanner Modal */}
             {
                 isScanning && (
                     <div className="modal-overlay" onClick={() => setIsScanning(false)}>
-                        <div className="modal scanner-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal scanner-modal cashier-scanner-shell" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h3>📷 Scan Barcode</h3>
+                                <div>
+                                    <span className="cashier-kicker">Mode scan</span>
+                                    <h3>📷 Scan Barcode</h3>
+                                </div>
                                 <button
                                     className="btn-close"
                                     onClick={() => setIsScanning(false)}
@@ -242,7 +292,6 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
                 )
             }
 
-            {/* Checkout Modal */}
             {
                 showCheckout && (
                     <CheckoutModal

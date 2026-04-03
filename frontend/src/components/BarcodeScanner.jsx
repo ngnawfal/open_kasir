@@ -169,16 +169,19 @@ function BarcodeScanner({ onScan, isScanning, setIsScanning }) {
     }
 
     return (
-        <div className="scanner-card">
-            {/* Video Container */}
+        <div className="scanner-card cashier-scanner-card">
+            <div className="cashier-scanner-header">
+                <div>
+                    <strong>Scanner Kamera</strong>
+                    <p>Arahkan barcode ke area kamera atau input manual jika perlu.</p>
+                </div>
+                <span className="cashier-scanner-counter">{scanCount} scan</span>
+            </div>
+
             <div
-                className="scanner-container"
+                className="scanner-container cashier-scanner-frame"
                 style={{
-                    display: isScanning ? 'block' : 'none',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: '8px',
-                    background: '#000'
+                    display: isScanning ? 'block' : 'none'
                 }}
             >
                 <video
@@ -193,63 +196,34 @@ function BarcodeScanner({ onScan, isScanning, setIsScanning }) {
                     playsInline
                     muted
                 />
-                {/* Scan line animation */}
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '10%',
-                    right: '10%',
-                    height: '2px',
-                    background: 'linear-gradient(90deg, transparent, #00ff00, transparent)',
-                    animation: 'scanLine 2s ease-in-out infinite'
-                }} />
+                <div className="cashier-scan-line" />
             </div>
 
-            {/* Status */}
             {status && isScanning && (
-                <div style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--success)',
-                    textAlign: 'center',
-                    padding: '8px 0'
-                }}>
+                <div className="cashier-scanner-status success">
                     ✅ {status}
                 </div>
             )}
 
-            {/* Error */}
             {error && (
-                <div style={{
-                    fontSize: '0.8rem',
-                    color: 'var(--danger)',
-                    textAlign: 'center',
-                    padding: '8px',
-                    background: 'var(--danger-light)',
-                    borderRadius: '6px',
-                    margin: '8px 0'
-                }}>
+                <div className="cashier-scanner-status error">
                     ❌ {error}
                 </div>
             )}
 
-
-
-            {/* Manual Input */}
-            <form onSubmit={handleManualSubmit} style={{ marginTop: '12px' }}>
-                <div className="flex gap-sm">
+            <form onSubmit={handleManualSubmit} className="cashier-manual-scan-form">
+                <div className="cashier-manual-row">
                     <input
                         type="text"
                         className="form-input"
                         value={manualInput}
                         onChange={(e) => setManualInput(e.target.value)}
-                        placeholder="Ketik barcode..."
-                        style={{ flex: 1, fontSize: '0.85rem' }}
+                        placeholder="Ketik barcode manual..."
                     />
-                    <button type="submit" className="btn btn-ghost">➕</button>
+                    <button type="submit" className="btn btn-ghost">Tambahkan</button>
                 </div>
             </form>
 
-            {/* CSS for scan line animation */}
             <style>{`
                 @keyframes scanLine {
                     0%, 100% { transform: translateY(-30px); opacity: 0.5; }

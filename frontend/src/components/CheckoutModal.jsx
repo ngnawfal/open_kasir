@@ -6,6 +6,7 @@ function CheckoutModal({ cart, cartTotal, discount, onClose, onComplete, authFet
     const [promoCode, setPromoCode] = useState('')
     const [appliedDiscount, setAppliedDiscount] = useState(discount)
     const [promoError, setPromoError] = useState('')
+    const [paymentError, setPaymentError] = useState('')
     const [isProcessing, setIsProcessing] = useState(false)
     const [receipt, setReceipt] = useState(null)
 
@@ -52,6 +53,7 @@ function CheckoutModal({ cart, cartTotal, discount, onClose, onComplete, authFet
     const handlePayment = async () => {
         if (!canPay) return
 
+        setPaymentError('')
         setIsProcessing(true)
         try {
             const finalPaid = paymentMethod === 'cash' ? paidAmount : finalTotal
@@ -77,7 +79,7 @@ function CheckoutModal({ cart, cartTotal, discount, onClose, onComplete, authFet
                 throw new Error(error.detail)
             }
         } catch (error) {
-            alert('Gagal memproses: ' + error.message)
+            setPaymentError(error.message || 'Gagal memproses pembayaran')
         } finally {
             setIsProcessing(false)
         }
@@ -94,7 +96,7 @@ function CheckoutModal({ cart, cartTotal, discount, onClose, onComplete, authFet
     if (receipt) {
         return (
             <div className="modal-overlay">
-                <div className="modal" style={{ maxWidth: '420px' }}>
+                <div className="modal cashier-receipt-modal">
                     <div className="modal-header">
                         <h2>✅ Pembayaran Berhasil</h2>
                         <button className="modal-close" onClick={handleDone}>×</button>
@@ -168,141 +170,155 @@ function CheckoutModal({ cart, cartTotal, discount, onClose, onComplete, authFet
 
     return (
         <div className="modal-overlay">
-            <div className="modal">
+            <div className="modal cashier-checkout-modal">
                 <div className="modal-header">
-                    <h2>💰 Pembayaran</h2>
+                    <div>
+                        <span className="cashier-kicker">Finalisasi transaksi</span>
+                        <h2>💰 Pembayaran</h2>
+                    </div>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
-                <div className="modal-body">
-                    {/* Order Summary */}
-                    <div className="checkout-summary">
-                        <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
-                            Ringkasan ({cart.length} item)
-                        </h4>
-                        <div style={{ maxHeight: '120px', overflowY: 'auto' }}>
+                <div className="modal-body cashier-checkout-layout">
+                    <div className="cashier-checkout-column primary">
+                        <div className="checkout-summary cashier-summary-card">
+                            <div className="cashier-section-heading">
+                                <h4>Ringkasan pesanan</h4>
+                                <span>{cart.length} item</span>
+                            </div>
+                            <div className="cashier-checkout-items">
                             {cart.map(item => (
                                 <div key={item.id} className="checkout-row">
                                     <span>{item.emoji} {item.name} x{item.quantity}</span>
                                     <span>{formatRupiah(item.price * item.quantity)}</span>
                                 </div>
                             ))}
-                        </div>
-                        <div className="checkout-row total">
-                            <span>Subtotal</span>
-                            <span>{formatRupiah(cartTotal)}</span>
-                        </div>
-                    </div>
-
-                    {/* Promo Code */}
-                    <div className="form-group">
-                        <label className="form-label">Kode Promo</label>
-                        <div className="flex gap-sm">
-                            <input
-                                type="text"
-                                className="form-input"
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                placeholder="Masukkan kode promo"
-                                style={{ flex: 1 }}
-                            />
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={applyPromo}
-                            >
-                                Pakai
-                            </button>
-                        </div>
-                        {promoError && <small className="text-danger">{promoError}</small>}
-                        {appliedDiscount && (
-                            <div style={{
-                                marginTop: '0.5rem',
-                                padding: '0.5rem',
-                                background: 'rgba(39, 174, 96, 0.2)',
-                                borderRadius: '8px',
-                                color: 'var(--success)'
-                            }}>
-                                ✅ {appliedDiscount.name} (-{appliedDiscount.discount_type === 'percentage'
-                                    ? `${appliedDiscount.value}%`
-                                    : formatRupiah(appliedDiscount.value)})
                             </div>
-                        )}
-                    </div>
-
-                    {/* Payment Method */}
-                    <div className="form-group">
-                        <label className="form-label">Metode Pembayaran</label>
-                        <div className="payment-methods">
-                            {paymentMethods.map(method => (
-                                <button
-                                    key={method.id}
-                                    type="button"
-                                    className={`payment-method-btn ${paymentMethod === method.id ? 'active' : ''}`}
-                                    onClick={() => setPaymentMethod(method.id)}
-                                >
-                                    {method.label}
-                                </button>
-                            ))}
+                            <div className="checkout-row total">
+                                <span>Subtotal</span>
+                                <span>{formatRupiah(cartTotal)}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Cash Input (only for cash) */}
-                    {paymentMethod === 'cash' && (
-                        <>
-                            <div className="form-group">
-                                <label className="form-label">Jumlah Bayar</label>
+                        <div className="form-group cashier-promo-card">
+                            <label className="form-label">Kode Promo</label>
+                            <div className="cashier-promo-row">
                                 <input
-                                    type="number"
+                                    type="text"
                                     className="form-input"
-                                    value={paid}
-                                    onChange={(e) => setPaid(e.target.value)}
-                                    placeholder="Masukkan jumlah uang"
+                                    value={promoCode}
+                                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                    placeholder="Masukkan kode promo"
                                 />
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={applyPromo}
+                                >
+                                    Pakai
+                                </button>
                             </div>
+                            {promoError && <small className="text-danger">{promoError}</small>}
+                            {appliedDiscount && (
+                                <div className="cashier-applied-promo">
+                                    ✅ {appliedDiscount.name} (-{appliedDiscount.discount_type === 'percentage'
+                                        ? `${appliedDiscount.value}%`
+                                        : formatRupiah(appliedDiscount.value)})
+                                </div>
+                            )}
+                        </div>
 
-                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                                {quickPayAmounts.map(amount => (
+                        <div className="form-group">
+                            <label className="form-label">Metode Pembayaran</label>
+                            <div className="payment-methods cashier-payment-grid">
+                                {paymentMethods.map(method => (
                                     <button
-                                        key={amount}
+                                        key={method.id}
                                         type="button"
-                                        className="btn btn-ghost btn-sm"
-                                        onClick={() => setPaid(amount.toString())}
+                                        className={`payment-method-btn ${paymentMethod === method.id ? 'active' : ''}`}
+                                        onClick={() => setPaymentMethod(method.id)}
                                     >
-                                        {formatRupiah(amount)}
+                                        <span>{method.icon}</span>
+                                        <span>{method.label.replace(`${method.icon} `, '')}</span>
                                     </button>
                                 ))}
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => setPaid(finalTotal.toString())}
-                                >
-                                    Uang Pas
-                                </button>
                             </div>
-                        </>
-                    )}
-
-                    {/* Final Summary */}
-                    <div className="checkout-summary">
-                        {discountAmount > 0 && (
-                            <div className="checkout-row" style={{ color: 'var(--danger)' }}>
-                                <span>Diskon</span>
-                                <span>-{formatRupiah(discountAmount)}</span>
-                            </div>
-                        )}
-                        <div className="checkout-row total">
-                            <span>Total Bayar</span>
-                            <span className="amount">{formatRupiah(finalTotal)}</span>
                         </div>
-                        {paymentMethod === 'cash' && paidAmount > 0 && (
-                            <div className={`checkout-row ${change >= 0 ? 'change' : ''}`}>
-                                <span>Kembalian</span>
-                                <span style={{ color: change >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                                    {change >= 0 ? formatRupiah(change) : `Kurang ${formatRupiah(-change)}`}
-                                </span>
+                    </div>
+
+                    <div className="cashier-checkout-column secondary">
+                        <div className="checkout-summary cashier-payment-card">
+                            <div className="cashier-section-heading">
+                                <h4>Panel pembayaran</h4>
+                                <span>{paymentMethod.toUpperCase()}</span>
                             </div>
-                        )}
+
+                            {paymentMethod === 'cash' && (
+                                <>
+                                    <div className="form-group">
+                                        <label className="form-label">Jumlah Bayar</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            value={paid}
+                                            onChange={(e) => setPaid(e.target.value)}
+                                            placeholder="Masukkan jumlah uang"
+                                        />
+                                    </div>
+
+                                    <div className="cashier-quickpay-grid">
+                                        {quickPayAmounts.map(amount => (
+                                            <button
+                                                key={amount}
+                                                type="button"
+                                                className="btn btn-ghost btn-sm"
+                                                onClick={() => setPaid(amount.toString())}
+                                            >
+                                                {formatRupiah(amount)}
+                                            </button>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => setPaid(finalTotal.toString())}
+                                        >
+                                            Uang Pas
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="checkout-summary cashier-final-summary">
+                                {discountAmount > 0 && (
+                                    <div className="checkout-row cashier-discount-row">
+                                        <span>Diskon</span>
+                                        <span>-{formatRupiah(discountAmount)}</span>
+                                    </div>
+                                )}
+                                <div className="checkout-row total">
+                                    <span>Total Bayar</span>
+                                    <span className="amount">{formatRupiah(finalTotal)}</span>
+                                </div>
+                                {paymentMethod === 'cash' && paidAmount > 0 && (
+                                    <div className={`checkout-row ${change >= 0 ? 'change' : ''}`}>
+                                        <span>Kembalian</span>
+                                        <span className={change >= 0 ? 'cashier-positive' : 'cashier-negative'}>
+                                            {change >= 0 ? formatRupiah(change) : `Kurang ${formatRupiah(-change)}`}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {paymentError && (
+                                <div className="cashier-payment-error">
+                                    ⚠️ {paymentError}
+                                </div>
+                            )}
+
+                            <div className="cashier-payment-footnote">
+                                Pastikan nominal dan metode pembayaran sesuai sebelum konfirmasi.
+                            </div>
+                        </div>
                     </div>
                 </div>
 

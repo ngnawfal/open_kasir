@@ -109,6 +109,525 @@ body {
   min-height: 100vh;
 }
 
+/* ========================================
+   CASHIER STAGE 1 POLISH
+======================================== */
+
+.cashier-shell {
+  gap: 20px;
+  padding: 20px;
+  align-items: stretch;
+}
+
+.cashier-products-surface,
+.cashier-cart-surface,
+.cashier-checkout-modal,
+.cashier-receipt-modal,
+.cashier-scanner-shell {
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.cashier-products-surface {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.08), transparent 24%),
+    var(--bg-card);
+}
+
+.cashier-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.cashier-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px 12px;
+}
+
+.cashier-title {
+  font-size: clamp(1.6rem, 1.6vw + 1rem, 2.3rem);
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+
+.cashier-subtitle {
+  color: var(--text-secondary);
+  max-width: 560px;
+}
+
+.cashier-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 12px;
+  min-width: min(100%, 360px);
+}
+
+.cashier-stat-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cashier-stat-card strong {
+  font-size: 1.4rem;
+}
+
+.cashier-stat-label {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.cashier-stat-card.warning strong {
+  color: var(--warning);
+}
+
+.cashier-stat-card.accent {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(37, 99, 235, 0.08));
+}
+
+.cashier-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 22px 14px;
+}
+
+.search-elevated {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.cashier-search-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 16px 0;
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.cashier-scan-btn {
+  min-width: 170px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 18px;
+}
+
+.cashier-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 22px 14px;
+}
+
+.cashier-category-tabs {
+  flex: 1;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.cashier-filter-meta {
+  display: flex;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.cashier-status-pill {
+  margin: 0 22px 14px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cashier-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.cashier-products-grid {
+  padding: 0 22px 22px;
+  align-content: start;
+}
+
+.cashier-product-card {
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.cashier-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+  border-color: rgba(59, 130, 246, 0.26);
+}
+
+.cashier-product-head,
+.cashier-product-footer,
+.cashier-cart-summary,
+.cashier-section-heading,
+.cashier-manual-row,
+.cashier-promo-row,
+.cashier-checkout-layout,
+.cashier-cart-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cashier-product-head {
+  align-items: flex-start;
+}
+
+.cashier-product-category,
+.cashier-product-stock,
+.cashier-summary-label,
+.cashier-payment-footnote,
+.cashier-scanner-header p {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.cashier-product-stock {
+  font-weight: 600;
+}
+
+.cashier-cart-surface {
+  width: min(100%, 380px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+}
+
+.cashier-cart-summary {
+  margin: 0 18px 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(15, 23, 42, 0.04));
+}
+
+.cashier-cart-summary strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.1rem;
+}
+
+.cashier-cart-items {
+  padding: 0 18px;
+}
+
+.cashier-cart-item-card {
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  margin-bottom: 12px;
+}
+
+.cashier-qty-control {
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(226, 232, 240, 0.6);
+}
+
+.cashier-cart-footer {
+  padding-top: 16px;
+  gap: 12px;
+}
+
+.cashier-cart-note {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.cashier-cart-empty-state {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+}
+
+.cashier-scanner-shell,
+.cashier-checkout-modal,
+.cashier-receipt-modal {
+  width: min(100%, 960px);
+  border-radius: 26px;
+}
+
+.cashier-scanner-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cashier-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cashier-scanner-header strong {
+  font-size: 1rem;
+}
+
+.cashier-scanner-counter {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cashier-scanner-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000;
+}
+
+.cashier-scan-line {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ff99, transparent);
+  animation: scanLine 2s ease-in-out infinite;
+}
+
+.cashier-scanner-status {
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.86rem;
+}
+
+.cashier-scanner-status.success {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+}
+
+.cashier-scanner-status.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.cashier-manual-scan-form {
+  margin-top: 6px;
+}
+
+.cashier-manual-row {
+  gap: 10px;
+}
+
+.cashier-checkout-layout {
+  align-items: stretch;
+  gap: 18px;
+}
+
+.cashier-checkout-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cashier-checkout-column.primary {
+  flex: 1.1;
+}
+
+.cashier-checkout-column.secondary {
+  flex: 0.9;
+}
+
+.cashier-summary-card,
+.cashier-payment-card,
+.cashier-promo-card,
+.cashier-final-summary {
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.cashier-summary-card,
+.cashier-payment-card,
+.cashier-promo-card {
+  padding: 18px;
+}
+
+.cashier-checkout-items {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cashier-section-heading h4 {
+  font-size: 1rem;
+}
+
+.cashier-section-heading span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.cashier-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cashier-payment-grid .payment-method-btn {
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+}
+
+.cashier-quickpay-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cashier-final-summary {
+  padding: 18px;
+}
+
+.cashier-discount-row {
+  color: var(--danger);
+}
+
+.cashier-positive {
+  color: var(--success);
+}
+
+.cashier-negative {
+  color: var(--danger);
+}
+
+.cashier-applied-promo,
+.cashier-payment-error {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+}
+
+.cashier-applied-promo {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+}
+
+.cashier-payment-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+@media (max-width: 1200px) {
+  .cashier-shell {
+    flex-direction: column;
+    max-height: none;
+    height: auto;
+  }
+
+  .cashier-cart-surface {
+    width: 100%;
+  }
+
+  .cashier-hero,
+  .cashier-filter-row,
+  .cashier-checkout-layout {
+    flex-direction: column;
+  }
+
+  .cashier-hero-stats {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .cashier-shell {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .cashier-hero,
+  .cashier-toolbar,
+  .cashier-filter-row,
+  .cashier-products-grid {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cashier-toolbar,
+  .cashier-manual-row {
+    flex-direction: column;
+  }
+
+  .cashier-scan-btn,
+  .cashier-promo-row .btn,
+  .cashier-manual-row .btn {
+    width: 100%;
+  }
+
+  .cashier-filter-meta,
+  .cashier-hero-stats,
+  .cashier-payment-grid {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .cashier-product-footer,
+  .cashier-cart-side,
+  .cashier-cart-summary,
+  .cashier-section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cashier-checkout-modal,
+  .cashier-receipt-modal,
+  .cashier-scanner-shell {
+    width: min(100%, calc(100vw - 20px));
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
