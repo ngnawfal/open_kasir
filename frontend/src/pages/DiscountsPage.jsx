@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { PageTitle } from '../components/PageTitle'
+import AccessDenied from '../components/common/AccessDenied'
+import PageLoading from '../components/common/PageLoading'
+import DiscountsToolbar from '../components/discounts/DiscountsToolbar'
+import DiscountCardsGrid from '../components/discounts/DiscountCardsGrid'
+import DiscountFormModal from '../components/discounts/DiscountFormModal'
 
 function DiscountsPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -129,222 +133,19 @@ function DiscountsPage() {
     }
 
     if (!isAdmin) {
-        return (
-            <div className="text-center" style={{ padding: '3rem' }}>
-                <span style={{ fontSize: '4rem' }}>🔒</span>
-                <h2 className="mt-md">Akses Ditolak</h2>
-                <p className="text-muted">Halaman ini hanya untuk Admin</p>
-            </div>
-        )
+        return <AccessDenied message="Halaman ini hanya untuk Admin" />
     }
 
     if (loading) {
-        return <div className="flex-center" style={{ height: '50vh' }}><div className="spinner"></div></div>
+        return <PageLoading />
     }
 
     return (
         <div className="page-container admin-page-shell discounts-page-shell">
-            <div className="admin-toolbar">
-                <PageTitle
-                    title="Manajemen Diskon & Promo"
-                    subtitle="Kelola kode promo dan penawaran spesial"
-                />
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="admin-toolbar-action warning"
-                >
-                    🏷️ Tambah Diskon
-                </button>
-            </div>
-
-            {discounts.length === 0 ? (
-                <div className="card admin-empty-state">
-                    <span className="admin-empty-icon">🏷️</span>
-                    <p>Belum ada diskon atau promo</p>
-                </div>
-            ) : (
-                <div className="discount-grid admin-coupon-grid">
-                    {discounts.map(discount => (
-                        <div
-                            key={discount.id}
-                            className={`discount-card admin-coupon-card ${discount.is_active ? 'active' : 'inactive'}`}
-                        >
-                            <div className="admin-coupon-badge">
-                                {discount.discount_type === 'percentage' ? `${discount.value}%` : '💰'}
-                            </div>
-
-                            <div className="admin-coupon-head">
-                                <div className="admin-coupon-title">
-                                    {discount.name}
-                                </div>
-                                <div className="admin-coupon-code">
-                                    {discount.code}
-                                </div>
-                            </div>
-
-                            <div className="admin-coupon-meta">
-                                <div>💵 {discount.discount_type === 'percentage'
-                                    ? `Diskon ${discount.value}%`
-                                    : `Potongan ${formatRupiah(discount.value)}`}
-                                </div>
-                                {discount.min_purchase > 0 && (
-                                    <div>🛒 Min. belanja {formatRupiah(discount.min_purchase)}</div>
-                                )}
-                                {discount.max_discount && (
-                                    <div>📊 Max. diskon {formatRupiah(discount.max_discount)}</div>
-                                )}
-                                <div>📈 Terpakai: {discount.usage_count}{discount.usage_limit && ` / ${discount.usage_limit}`}</div>
-                                {discount.valid_until && (
-                                    <div>📅 Berlaku hingga {new Date(discount.valid_until).toLocaleDateString('id-ID')}</div>
-                                )}
-                            </div>
-
-                            <div className="admin-coupon-actions">
-                                <button
-                                    onClick={() => toggleActive(discount)}
-                                    className="admin-coupon-action primary"
-                                >
-                                    {discount.is_active ? '❌ Nonaktifkan' : '✅ Aktifkan'}
-                                </button>
-                                <button
-                                    onClick={() => handleEdit(discount)}
-                                    className="admin-coupon-action icon"
-                                >
-                                    ✏️
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(discount.id)}
-                                    className="admin-coupon-action danger"
-                                >
-                                    🗑️
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Add/Edit Modal */}
-            {showForm && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <div className="modal-header">
-                            <h2>{selectedDiscount ? '✏️ Edit Diskon' : '➕ Tambah Diskon'}</h2>
-                            <button className="modal-close" onClick={resetForm}>×</button>
-                        </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="modal-body">
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Kode Promo *</label>
-                                        <input
-                                            type="text"
-                                            className="form-input"
-                                            value={formData.code}
-                                            onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                            placeholder="HEMAT10"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Nama Diskon *</label>
-                                        <input
-                                            type="text"
-                                            className="form-input"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            placeholder="Diskon 10%"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Tipe Diskon</label>
-                                        <select
-                                            className="form-input"
-                                            value={formData.discount_type}
-                                            onChange={(e) => setFormData({ ...formData, discount_type: e.target.value })}
-                                        >
-                                            <option value="percentage">Persentase (%)</option>
-                                            <option value="fixed">Nominal (Rp)</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">
-                                            Nilai {formData.discount_type === 'percentage' ? '(%)' : '(Rp)'} *
-                                        </label>
-                                        <input
-                                            type="number"
-                                            className="form-input"
-                                            value={formData.value}
-                                            onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                                            placeholder={formData.discount_type === 'percentage' ? '10' : '5000'}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Min. Pembelian (Rp)</label>
-                                        <input
-                                            type="number"
-                                            className="form-input"
-                                            value={formData.min_purchase}
-                                            onChange={(e) => setFormData({ ...formData, min_purchase: e.target.value })}
-                                            placeholder="50000"
-                                        />
-                                    </div>
-                                    {formData.discount_type === 'percentage' && (
-                                        <div className="form-group">
-                                            <label className="form-label">Max. Diskon (Rp)</label>
-                                            <input
-                                                type="number"
-                                                className="form-input"
-                                                value={formData.max_discount}
-                                                onChange={(e) => setFormData({ ...formData, max_discount: e.target.value })}
-                                                placeholder="20000"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Berlaku Hingga</label>
-                                        <input
-                                            type="date"
-                                            className="form-input"
-                                            value={formData.valid_until}
-                                            onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Batas Penggunaan</label>
-                                        <input
-                                            type="number"
-                                            className="form-input"
-                                            value={formData.usage_limit}
-                                            onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value })}
-                                            placeholder="100"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-ghost" onClick={resetForm}>Batal</button>
-                                <button type="submit" className="btn btn-success">
-                                    {selectedDiscount ? 'Simpan' : 'Tambah'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )
-            }
-        </div >
+            <DiscountsToolbar setShowForm={setShowForm} />
+            <DiscountCardsGrid discounts={discounts} formatRupiah={formatRupiah} toggleActive={toggleActive} handleEdit={handleEdit} handleDelete={handleDelete} />
+            <DiscountFormModal showForm={showForm} selectedDiscount={selectedDiscount} resetForm={resetForm} handleSubmit={handleSubmit} formData={formData} setFormData={setFormData} />
+        </div>
     )
 }
 
