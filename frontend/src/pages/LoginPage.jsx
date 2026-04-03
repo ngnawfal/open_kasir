@@ -66,8 +66,7 @@ function LoginPage() {
 
                         <button
                             type="submit"
-                            className="btn btn-primary btn-lg"
-                            style={{ width: '100%' }}
+                            className="btn btn-primary btn-lg login-submit-btn"
                             disabled={isLoading}
                         >
                             {isLoading ? '⏳ Memproses...' : '🔐 Login'}

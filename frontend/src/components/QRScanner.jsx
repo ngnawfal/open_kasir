@@ -79,14 +79,8 @@ function QRScanner({ onScan, isScanning, setIsScanning }) {
             <div className="scanner-container" id="qr-reader" ref={scannerRef}>
                 {!isScanning && (
                     <div className="scanner-overlay">
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            color: 'white',
-                            padding: '2rem'
-                        }}>
-                            <span style={{ fontSize: '4rem', marginBottom: '1rem' }}>📷</span>
+                        <div className="qr-scanner-overlay-content">
+                            <span className="qr-scanner-overlay-icon">📷</span>
                             <p>Klik tombol untuk mulai scan</p>
                         </div>
                     </div>
@@ -100,14 +94,13 @@ function QRScanner({ onScan, isScanning, setIsScanning }) {
             )}
 
             <button
-                className={`btn ${isScanning ? 'btn-danger' : 'btn-primary'} btn-lg mt-md`}
+                className={`btn ${isScanning ? 'btn-danger' : 'btn-primary'} btn-lg mt-md qr-scanner-toggle`}
                 onClick={toggleScanner}
-                style={{ width: '100%' }}
             >
                 {isScanning ? '⏹️ Stop Scanner' : '▶️ Mulai Scan'}
             </button>
 
-            <p className="text-muted mt-md" style={{ fontSize: '0.85rem' }}>
+            <p className="text-muted mt-md qr-scanner-help-text">
                 Arahkan kamera ke QR code produk untuk menambahkan ke keranjang
             </p>
         </div>

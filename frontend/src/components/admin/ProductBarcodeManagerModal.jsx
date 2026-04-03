@@ -21,59 +21,37 @@ function ProductBarcodeManagerModal({
 
     return (
         <div className="modal-overlay">
-            <div className="modal" style={{ maxWidth: '500px' }}>
+            <div className="modal barcode-manager-modal">
                 <div className="modal-header">
                     <h2>🏷️ Kelola Barcode</h2>
                     <button className="modal-close" onClick={closeBarcodeModal}>×</button>
                 </div>
                 <div className="modal-body">
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px',
-                        background: 'var(--bg-main)',
-                        borderRadius: '8px',
-                        marginBottom: '16px'
-                    }}>
-                        <span style={{ fontSize: '2rem' }}>{showBarcodeModal.emoji}</span>
+                    <div className="barcode-manager-product-card">
+                        <span className="barcode-manager-product-emoji">{showBarcodeModal.emoji}</span>
                         <div>
-                            <div style={{ fontWeight: '600' }}>{showBarcodeModal.name}</div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                            <div className="barcode-manager-product-name">{showBarcodeModal.name}</div>
+                            <div className="barcode-manager-product-meta">
                                 {showBarcodeModal.category}
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontWeight: '600', marginBottom: '8px' }}>
+                    <div className="barcode-manager-section">
+                        <div className="barcode-manager-section-title">
                             Daftar Barcode ({productBarcodes.length})
                         </div>
                         {productBarcodes.length === 0 ? (
-                            <div style={{
-                                color: 'var(--text-muted)',
-                                textAlign: 'center',
-                                padding: '16px',
-                                background: 'var(--bg-main)',
-                                borderRadius: '8px'
-                            }}>
+                            <div className="barcode-manager-empty">
                                 Belum ada barcode
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div className="barcode-manager-list">
                                 {productBarcodes.map((bc, idx) => (
-                                    <div key={idx} style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: '10px 12px',
-                                        background: 'var(--bg-main)',
-                                        borderRadius: '8px',
-                                        border: bc.is_primary ? '2px solid var(--primary)' : '1px solid var(--border)'
-                                    }}>
+                                    <div key={idx} className={`barcode-manager-item ${bc.is_primary ? 'primary' : ''}`}>
                                         <div>
-                                            <div style={{ fontFamily: 'monospace', fontWeight: '500' }}>{bc.barcode}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                            <div className="barcode-manager-code">{bc.barcode}</div>
+                                            <div className="barcode-manager-code-note">
                                                 {bc.is_primary ? '⭐ Barcode Utama' : bc.description}
                                             </div>
                                         </div>
@@ -88,9 +66,9 @@ function ProductBarcodeManagerModal({
                         )}
                     </div>
 
-                    <div style={{ padding: '16px', background: 'var(--bg-main)', borderRadius: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px', flexWrap: 'wrap' }}>
-                            <div style={{ fontWeight: '600' }}>➕ Tambah Barcode</div>
+                    <div className="barcode-manager-create-panel">
+                        <div className="barcode-manager-create-header">
+                            <div className="barcode-manager-section-title">➕ Tambah Barcode</div>
                             <button
                                 className={`btn btn-sm ${batchScanMode ? 'btn-danger' : 'btn-primary'}`}
                                 onClick={async () => {
@@ -124,36 +102,29 @@ function ProductBarcodeManagerModal({
                             </button>
                         </div>
                         {batchScanMode && (
-                            <div style={{ marginBottom: '12px' }}>
-                                <video ref={scanVideoRef} style={{ width: '100%', maxHeight: '180px', borderRadius: '8px', background: '#000' }} playsInline muted autoPlay />
-                                <div style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--success)', marginTop: '8px' }}>
+                            <div className="barcode-manager-camera-wrap">
+                                <video ref={scanVideoRef} className="barcode-manager-camera" playsInline muted autoPlay />
+                                <div className="barcode-manager-camera-status">
                                     📷 Scan kamera aktif ({scannedBarcodes.length} baru)
                                 </div>
                             </div>
                         )}
                         {usbScanMode && (
-                            <div style={{
-                                marginBottom: '12px',
-                                padding: '16px',
-                                background: 'linear-gradient(135deg, #10b981, #059669)',
-                                borderRadius: '8px',
-                                textAlign: 'center',
-                                color: 'white'
-                            }}>
-                                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🔌</div>
-                                <div style={{ fontWeight: '600' }}>USB Scanner Aktif</div>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.9, marginTop: '4px' }}>
+                            <div className="barcode-manager-usb-state">
+                                <div className="barcode-manager-usb-icon">🔌</div>
+                                <div className="barcode-manager-usb-title">USB Scanner Aktif</div>
+                                <div className="barcode-manager-usb-copy">
                                     Langsung scan barcode dengan scanner USB!
                                 </div>
                                 {scannedBarcodes.length > 0 && (
-                                    <div style={{ marginTop: '8px', fontWeight: '600' }}>
+                                    <div className="barcode-manager-usb-count">
                                         ✓ {scannedBarcodes.length} barcode ditambahkan
                                     </div>
                                 )}
                             </div>
                         )}
                         {!batchScanMode && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div className="barcode-manager-manual-form">
                                 <input type="text" className="form-input" value={newBarcodeInput} onChange={(e) => setNewBarcodeInput(e.target.value)} placeholder="Atau ketik barcode manual..." />
                                 <button className="btn btn-success w-full" onClick={addBarcodeAlias} disabled={!newBarcodeInput.trim()}>➕ Tambah</button>
                             </div>

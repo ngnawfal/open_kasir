@@ -11,26 +11,25 @@ function CustomersToolbar({ setShowForm, searchQuery, setSearchQuery, showDebtOn
                 </button>
             </div>
 
-            <div className="card admin-surface-card mb-6" style={{ padding: '16px' }}>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <div style={{ flex: 1, minWidth: '250px' }}>
+            <div className="card admin-surface-card customers-toolbar-card mb-6">
+                <div className="customers-toolbar-row">
+                    <div className="customers-search-field">
                         <input
                             type="text"
                             placeholder="🔍 Cari nama atau telepon..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="form-input"
-                            style={{ width: '100%' }}
                         />
                     </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    <label className="customers-checkbox-row">
                         <input
                             type="checkbox"
                             checked={showDebtOnly}
                             onChange={(e) => setShowDebtOnly(e.target.checked)}
-                            style={{ width: '18px', height: '18px' }}
+                            className="customers-checkbox-input"
                         />
-                        <span style={{ fontSize: '14px', fontWeight: '500' }}>Hanya yang Punya Hutang</span>
+                        <span className="customers-checkbox-label">Hanya yang Punya Hutang</span>
                     </label>
                 </div>
             </div>

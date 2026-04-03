@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { PageTitle } from '../components/PageTitle'
+import PageLoading from '../components/common/PageLoading'
 import HistorySummaryCards from '../components/history/HistorySummaryCards'
 import HistoryFiltersCard from '../components/history/HistoryFiltersCard'
 import TransactionHistoryList from '../components/history/TransactionHistoryList'
@@ -64,7 +65,7 @@ function HistoryPage() {
     const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
 
     if (loading) {
-        return <div className="flex-center" style={{ height: '50vh' }}><div className="spinner"></div></div>
+        return <PageLoading />
     }
 
     return (

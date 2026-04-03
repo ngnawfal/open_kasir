@@ -29,7 +29,7 @@ function ProductListSection({
                 </button>
             </div>
 
-            <div className="card admin-surface-card" style={{ padding: '24px' }}>
+            <div className="card admin-surface-card product-list-card">
                 <input
                     type="text"
                     className="form-input mb-md"
@@ -38,19 +38,14 @@ function ProductListSection({
                     placeholder="🔍 Cari produk atau barcode..."
                 />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="product-list-stack">
                     {filteredProducts.map(product => (
-                        <div
-                            key={product.id}
-                            className="product-item"
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-main)'}
-                        >
+                        <div key={product.id} className="product-item">
                             <div className="product-item-image">
                                 {product.image_url ? (
-                                    <img src={product.image_url} alt={product.name} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' }} />
+                                    <img src={product.image_url} alt={product.name} className="product-item-image-asset" />
                                 ) : (
-                                    <span style={{ fontSize: '1.8rem' }}>{product.emoji}</span>
+                                    <span className="product-item-emoji">{product.emoji}</span>
                                 )}
                             </div>
 
@@ -59,15 +54,15 @@ function ProductListSection({
                                 <div className="product-item-details">
                                     <span className="product-item-price">{formatRupiah(product.price)}</span>
                                     <span className="product-item-category">{product.category}</span>
-                                    <span>Stok: <span style={{ fontWeight: '600', color: product.stock <= 5 ? 'var(--danger)' : 'var(--success)' }}>{product.stock}</span></span>
-                                    {product.barcode && <span style={{ fontFamily: 'monospace', fontSize: '11px' }}>📊 {product.barcode}</span>}
+                                    <span>Stok: <span className={`product-stock-value ${product.stock <= 5 ? 'low' : 'ok'}`}>{product.stock}</span></span>
+                                    {product.barcode && <span className="product-barcode-inline">📊 {product.barcode}</span>}
                                 </div>
                             </div>
 
                             <div className="product-actions">
                                 <label className="action-btn">
                                     📷 Gambar
-                                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(product.id, e.target.files[0])} disabled={uploading} />
+                                    <input type="file" accept="image/*" className="hidden-file-input" onChange={(e) => handleImageUpload(product.id, e.target.files[0])} disabled={uploading} />
                                 </label>
                                 <button onClick={() => showBarcode(product)} className="action-btn">📊 Barcode</button>
                                 <button onClick={() => openBarcodeModal(product)} className="action-btn">🏷️ Kelola</button>

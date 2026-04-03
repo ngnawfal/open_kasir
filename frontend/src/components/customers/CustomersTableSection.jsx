@@ -1,7 +1,7 @@
-function memberColors(memberLevel) {
-    if (memberLevel === 'Gold') return { background: 'rgba(241, 196, 15, 0.2)', color: '#f1c40f' }
-    if (memberLevel === 'Silver') return { background: 'rgba(149, 165, 166, 0.2)', color: '#7f8c8d' }
-    return { background: 'rgba(211, 84, 0, 0.1)', color: '#d35400' }
+function memberTone(memberLevel) {
+    if (memberLevel === 'Gold') return 'gold'
+    if (memberLevel === 'Silver') return 'silver'
+    return 'bronze'
 }
 
 function memberEmoji(memberLevel) {
@@ -26,28 +26,28 @@ function CustomersTableSection({ filteredCustomers, handleEdit, handlePayDebt })
                     </thead>
                     <tbody>
                         {filteredCustomers.map(customer => {
-                            const colors = memberColors(customer.member_level)
+                            const tone = memberTone(customer.member_level)
                             return (
                                 <tr key={customer.id}>
                                     <td>
                                         <div className="user-cell">
-                                            <div className="user-avatar-small" style={colors}>
+                                            <div className={`user-avatar-small member-avatar ${tone}`}>
                                                 {memberEmoji(customer.member_level)}
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: 600 }}>{customer.name}</div>
-                                                <div className="text-muted" style={{ fontSize: '0.75rem' }}>ID: #{customer.id}</div>
+                                                <div className="font-semibold">{customer.name}</div>
+                                                <div className="text-muted customer-id-text">ID: #{customer.id}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                        <div className="customer-contact-stack">
                                             <span className="text-muted">📱 {customer.phone || '-'}</span>
                                             {customer.email && <span className="text-muted">📧 {customer.email}</span>}
                                         </div>
                                     </td>
                                     <td>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <div className="customer-member-stack">
                                             <span className={`status-badge status-${customer.member_level.toLowerCase()}`}>
                                                 {customer.member_level}
                                             </span>
@@ -57,7 +57,7 @@ function CustomersTableSection({ filteredCustomers, handleEdit, handlePayDebt })
                                     </td>
                                     <td>
                                         {customer.total_debt > 0 ? (
-                                            <span className="status-badge status-inactive" style={{ fontSize: '0.85rem' }}>
+                                            <span className="status-badge status-inactive customer-debt-badge">
                                                 ⚠️ Rp {customer.total_debt.toLocaleString()}
                                             </span>
                                         ) : (
@@ -85,15 +85,15 @@ function CustomersTableSection({ filteredCustomers, handleEdit, handlePayDebt })
 
             <div className="mobile-card-list">
                 {filteredCustomers.map(customer => {
-                    const colors = memberColors(customer.member_level)
+                    const tone = memberTone(customer.member_level)
                     return (
-                        <div key={customer.id} className="mobile-card" style={{ borderLeft: customer.total_debt > 0 ? '4px solid var(--danger)' : '1px solid var(--border)' }}>
+                        <div key={customer.id} className={`mobile-card customer-mobile-card ${customer.total_debt > 0 ? 'with-debt' : ''}`}>
                             <div className="mobile-card-header">
                                 <div className="user-cell">
-                                    <div className="user-avatar-small" style={colors}>{memberEmoji(customer.member_level)}</div>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ fontWeight: 600 }}>{customer.name}</span>
-                                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>{customer.phone || '-'}</span>
+                                    <div className={`user-avatar-small member-avatar ${tone}`}>{memberEmoji(customer.member_level)}</div>
+                                    <div className="mobile-stack-inline">
+                                        <span className="font-semibold">{customer.name}</span>
+                                        <span className="text-muted customer-phone-subtext">{customer.phone || '-'}</span>
                                     </div>
                                 </div>
                                 <span className={`status-badge status-${customer.member_level.toLowerCase()}`}>{customer.member_level}</span>
@@ -110,7 +110,7 @@ function CustomersTableSection({ filteredCustomers, handleEdit, handlePayDebt })
                             </div>
 
                             {customer.total_debt > 0 && (
-                                <div className="mobile-card-row" style={{ marginTop: '8px', color: 'var(--danger)', fontWeight: 'bold' }}>
+                                <div className="mobile-card-row customer-debt-row">
                                     <span>⚠️ Hutang</span>
                                     <span>Rp {customer.total_debt.toLocaleString()}</span>
                                 </div>

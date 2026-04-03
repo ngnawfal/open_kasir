@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { PageTitle } from '../components/PageTitle'
+import AccessDenied from '../components/common/AccessDenied'
+import PageLoading from '../components/common/PageLoading'
 
 function InventoryPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -72,17 +74,11 @@ function InventoryPage() {
     }
 
     if (!isAdmin) {
-        return (
-            <div className="text-center" style={{ padding: '3rem' }}>
-                <span style={{ fontSize: '4rem' }}>🔒</span>
-                <h2 className="mt-md">Akses Ditolak</h2>
-                <p className="text-muted">Halaman ini hanya untuk Admin</p>
-            </div>
-        )
+        return <AccessDenied message="Halaman ini hanya untuk Admin" />
     }
 
     if (loading) {
-        return <div className="flex-center" style={{ height: '50vh' }}><div className="spinner"></div></div>
+        return <PageLoading />
     }
 
     return (
@@ -195,12 +191,7 @@ function InventoryPage() {
                                     <img
                                         src={selectedProduct.image_url}
                                         alt={selectedProduct.name}
-                                        style={{
-                                            width: '60px',
-                                            height: '60px',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px'
-                                        }}
+                                        className="adjust-product-image"
                                     />
                                 ) : (
                                     <span className="adjust-emoji">{selectedProduct.emoji}</span>

@@ -31,14 +31,13 @@ function ProductFormModal({
                     <div className="modal-body">
                         <div className="form-group">
                             <label className="form-label">Barcode (Opsional untuk Snack/Kemasan)</label>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div className="input-with-action">
                                 <input
                                     type="text"
                                     className="form-input"
                                     value={formData.barcode}
                                     onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
                                     placeholder="Ketik atau scan barcode"
-                                    style={{ flex: 1 }}
                                 />
                                 <button
                                     type="button"
@@ -48,7 +47,7 @@ function ProductFormModal({
                                     📷 Scan
                                 </button>
                             </div>
-                            <small style={{ color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                            <small className="barcode-help-text">
                                 Kosongkan untuk Makanan/Minuman yang disajikan langsung
                             </small>
                         </div>
@@ -65,7 +64,7 @@ function ProductFormModal({
                             />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="form-grid-two">
                             <div className="form-group">
                                 <label className="form-label">Harga Jual (Rp) *</label>
                                 <input
@@ -89,7 +88,7 @@ function ProductFormModal({
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="form-grid-two">
                             <div className="form-group">
                                 <label className="form-label">Stok *</label>
                                 <input
@@ -135,62 +134,39 @@ function ProductFormModal({
                             {(formData.category === '' || formData.category === customCategory || !categories.includes(formData.category)) && (
                                 <input
                                     type="text"
-                                    className="form-input"
+                                    className="form-input category-custom-input"
                                     value={customCategory || formData.category}
                                     onChange={(e) => {
                                         setCustomCategory(e.target.value)
                                         setFormData({ ...formData, category: e.target.value })
                                     }}
                                     placeholder="Ketik kategori baru..."
-                                    style={{ marginTop: '0.5rem' }}
                                 />
                             )}
                         </div>
 
                         <div className="form-group">
                             <label className="form-label">Foto Produk</label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <div style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    borderRadius: '12px',
-                                    background: '#f3f4f6',
-                                    border: '2px dashed #d1d5db',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    overflow: 'hidden',
-                                    flexShrink: 0
-                                }}>
+                            <div className="media-picker-row">
+                                <div className="media-preview-box">
                                     {previewUrl ? (
-                                        <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={previewUrl} alt="Preview" className="media-preview-image" />
                                     ) : selectedProduct?.image_url ? (
-                                        <img src={selectedProduct.image_url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={selectedProduct.image_url} alt="Preview" className="media-preview-image" />
                                     ) : (
-                                        <span style={{ fontSize: '2rem', opacity: 0.4 }}>📷</span>
+                                        <span className="media-preview-placeholder">📷</span>
                                     )}
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>
+                                <div className="media-picker-copy">
+                                    <p className="media-picker-note">
                                         {previewUrl ? '✅ Foto siap diupload' : selectedProduct?.image_url ? 'Foto sudah diupload' : 'Pilih foto untuk produk'}
                                     </p>
-                                    <label style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '8px 16px',
-                                        background: '#4f46e5',
-                                        color: 'white',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        fontSize: '13px',
-                                        fontWeight: '500'
-                                    }}>
+                                    <label className="media-picker-button">
                                         📷 {previewUrl || selectedProduct?.image_url ? 'Ganti Foto' : 'Pilih Foto'}
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            style={{ display: 'none' }}
+                                            className="hidden-file-input"
                                             onChange={(e) => {
                                                 if (e.target.files[0]) {
                                                     const file = e.target.files[0]
@@ -216,17 +192,7 @@ function ProductFormModal({
                                                     handleDeleteImage(selectedProduct.id)
                                                 }
                                             }}
-                                            style={{
-                                                marginLeft: '8px',
-                                                padding: '8px 16px',
-                                                background: '#fee2e2',
-                                                color: '#ef4444',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                cursor: 'pointer',
-                                                fontSize: '13px',
-                                                fontWeight: '500'
-                                            }}
+                                            className="media-delete-button"
                                         >
                                             🗑️ Hapus
                                         </button>
@@ -237,13 +203,12 @@ function ProductFormModal({
 
                         <div className="form-group">
                             <label className="form-label">Emoji (Fallback jika tidak ada foto)</label>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div className="emoji-picker-grid">
                                 {emojiOptions.map(emoji => (
                                     <button
                                         key={emoji}
                                         type="button"
-                                        className={`btn ${formData.emoji === emoji ? 'btn-primary' : 'btn-ghost'}`}
-                                        style={{ fontSize: '1.5rem', padding: '0.5rem' }}
+                                        className={`btn ${formData.emoji === emoji ? 'btn-primary' : 'btn-ghost'} emoji-picker-btn`}
                                         onClick={() => setFormData({ ...formData, emoji })}
                                     >
                                         {emoji}

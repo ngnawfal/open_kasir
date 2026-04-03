@@ -178,21 +178,10 @@ function BarcodeScanner({ onScan, isScanning, setIsScanning }) {
                 <span className="cashier-scanner-counter">{scanCount} scan</span>
             </div>
 
-            <div
-                className="scanner-container cashier-scanner-frame"
-                style={{
-                    display: isScanning ? 'block' : 'none'
-                }}
-            >
+            <div className={`scanner-container cashier-scanner-frame ${isScanning ? 'is-visible' : 'is-hidden'}`}>
                 <video
                     ref={videoRef}
-                    style={{
-                        width: '100%',
-                        height: 'auto',
-                        minHeight: '250px',
-                        maxHeight: '400px',
-                        objectFit: 'cover'
-                    }}
+                    className="cashier-scanner-video"
                     playsInline
                     muted
                 />

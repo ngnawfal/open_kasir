@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import PageLoading from '../components/common/PageLoading'
 import CustomersSummaryCards from '../components/customers/CustomersSummaryCards'
 import CustomersToolbar from '../components/customers/CustomersToolbar'
 import CustomersTableSection from '../components/customers/CustomersTableSection'
@@ -109,7 +110,7 @@ function CustomersPage() {
     const totalDebt = customers.reduce((sum, c) => sum + (c.total_debt || 0), 0)
 
     if (loading) {
-        return <div className="flex-center" style={{ height: '50vh' }}><div className="spinner"></div></div>
+        return <PageLoading />
     }
 
     return (

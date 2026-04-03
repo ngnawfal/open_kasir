@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { BrowserMultiFormatReader } from '@zxing/library'
+import AccessDenied from '../components/common/AccessDenied'
 import ProductListSection from '../components/admin/ProductListSection'
 import ProductBarcodePreviewModal from '../components/admin/ProductBarcodePreviewModal'
 import ProductFormModal from '../components/admin/ProductFormModal'
@@ -528,17 +529,11 @@ function AdminPage({ products, onProductsChange }) {
     }
 
     if (!isAdmin) {
-        return (
-            <div className="text-center" style={{ padding: '3rem' }}>
-                <span style={{ fontSize: '4rem' }}>🔒</span>
-                <h2 className="mt-md">Akses Ditolak</h2>
-                <p className="text-muted">Halaman ini hanya untuk Admin</p>
-            </div>
-        )
+        return <AccessDenied message="Halaman ini hanya untuk Admin" />
     }
 
     return (
-        <div className="page-container admin-page-shell" style={{ maxWidth: '100%', padding: '24px' }}>
+        <div className="page-container admin-page-shell admin-page-layout">
             <ProductListSection
                 products={products}
                 filteredProducts={filteredProducts}
@@ -587,8 +582,8 @@ function AdminPage({ products, onProductsChange }) {
 
             {uploading && (
                 <div className="modal-overlay">
-                    <div style={{ textAlign: 'center', color: 'white' }}>
-                        <div className="spinner" style={{ margin: '0 auto 1rem' }}></div>
+                    <div className="uploading-overlay-card">
+                        <div className="spinner uploading-overlay-spinner"></div>
                         <p>Mengupload gambar...</p>
                     </div>
                 </div>

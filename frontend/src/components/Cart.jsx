@@ -15,7 +15,7 @@ function Cart({ cart, cartTotal, cartCount, updateQuantity, clearCart, onCheckou
                     <div className="cart-empty">
                         <span className="cart-empty-icon">🛒</span>
                         <p>Keranjang masih kosong</p>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        <span className="cart-empty-subtext">
                             Scan barcode atau pilih produk
                         </span>
                     </div>

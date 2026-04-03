@@ -14,7 +14,7 @@ function CheckoutReceiptView({ receipt, formatRupiah, handleDone, handlePrint })
                             <div className="receipt-date">
                                 {new Date(receipt.created_at).toLocaleString('id-ID')}
                             </div>
-                            <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
+                            <div className="receipt-number">
                                 No: #{receipt.id.toString().padStart(6, '0')}
                             </div>
                         </div>
@@ -39,7 +39,7 @@ function CheckoutReceiptView({ receipt, formatRupiah, handleDone, handlePrint })
                                 <span>{formatRupiah(receipt.subtotal)}</span>
                             </div>
                             {receipt.discount_amount > 0 && (
-                                <div className="receipt-total-row" style={{ color: '#e74c3c' }}>
+                                <div className="receipt-total-row receipt-discount-row">
                                     <span>Diskon ({receipt.discount_code})</span>
                                     <span>-{formatRupiah(receipt.discount_amount)}</span>
                                 </div>
@@ -52,7 +52,7 @@ function CheckoutReceiptView({ receipt, formatRupiah, handleDone, handlePrint })
                                 <span>Bayar ({receipt.payment_method.toUpperCase()})</span>
                                 <span>{formatRupiah(receipt.paid)}</span>
                             </div>
-                            <div className="receipt-total-row" style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                            <div className="receipt-total-row receipt-change-row">
                                 <span>Kembalian</span>
                                 <span>{formatRupiah(receipt.change)}</span>
                             </div>
