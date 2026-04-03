@@ -1,16 +1,25 @@
-import { useState, useEffect } from 'react'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import Header from './components/Header'
-import LoginPage from './pages/LoginPage'
-import CashierPage from './pages/CashierPage'
-import AdminPage from './pages/AdminPage'
-import InventoryPage from './pages/InventoryPage'
-import DiscountsPage from './pages/DiscountsPage'
-import ReportsPage from './pages/ReportsPage'
-import HistoryPage from './pages/HistoryPage'
-import CustomersPage from './pages/CustomersPage'
-import UsersPage from './pages/UsersPage'
+
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const CashierPage = lazy(() => import('./pages/CashierPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
+const InventoryPage = lazy(() => import('./pages/InventoryPage'))
+const DiscountsPage = lazy(() => import('./pages/DiscountsPage'))
+const ReportsPage = lazy(() => import('./pages/ReportsPage'))
+const HistoryPage = lazy(() => import('./pages/HistoryPage'))
+const CustomersPage = lazy(() => import('./pages/CustomersPage'))
+const UsersPage = lazy(() => import('./pages/UsersPage'))
+
+function PageFallback() {
+    return (
+        <div className="flex-center" style={{ minHeight: '40vh' }}>
+            <div className="spinner"></div>
+        </div>
+    )
+}
 
 function AppContent() {
     const { isAuthenticated, loading } = useAuth()
@@ -101,7 +110,11 @@ function AppContent() {
 
     // Show login if not authenticated
     if (!isAuthenticated) {
-        return <LoginPage />
+        return (
+            <Suspense fallback={<PageFallback />}>
+                <LoginPage />
+            </Suspense>
+        )
     }
 
     const renderPage = () => {
@@ -149,7 +162,9 @@ function AppContent() {
             />
             <div className={`app-content page-${currentPage} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
                 <main className={`main-content page-${currentPage}`}>
-                    {renderPage()}
+                    <Suspense fallback={<PageFallback />}>
+                        {renderPage()}
+                    </Suspense>
                 </main>
             </div>
         </div>
