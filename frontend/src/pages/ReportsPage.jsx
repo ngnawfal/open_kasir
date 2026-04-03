@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import { PageTitle } from '../components/PageTitle'
 import AccessDenied from '../components/common/AccessDenied'
 import PageLoading from '../components/common/PageLoading'
@@ -12,6 +13,7 @@ import BestSellersPanel from '../components/reports/BestSellersPanel'
 
 function ReportsPage() {
     const { authFetch, isAdmin } = useAuth()
+    const { notify } = useUI()
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('daily')
     const [dailyReport, setDailyReport] = useState(null)
@@ -76,11 +78,11 @@ function ReportsPage() {
                 window.URL.revokeObjectURL(url)
                 document.body.removeChild(a)
             } else {
-                alert('Gagal export data')
+                notify({ type: 'error', title: 'Export gagal', message: 'Gagal export data' })
             }
         } catch (error) {
             console.error('Error:', error)
-            alert('Error saat export: ' + error.message)
+            notify({ type: 'error', title: 'Export gagal', message: error.message })
         }
     }
 

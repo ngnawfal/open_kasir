@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useUI } from '../context/UIContext'
 import AccessDenied from '../components/common/AccessDenied'
 import PageLoading from '../components/common/PageLoading'
 import UsersToolbar from '../components/users/UsersToolbar'
@@ -10,6 +11,7 @@ import ResetPasswordModal from '../components/users/ResetPasswordModal'
 
 function UsersPage() {
     const { authFetch, isAdmin } = useAuth()
+    const { notify } = useUI()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [showForm, setShowForm] = useState(false)
@@ -66,10 +68,10 @@ function UsersPage() {
                 resetForm()
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal menyimpan user', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal menyimpan user', message: error.message })
         }
     }
 
@@ -81,15 +83,15 @@ function UsersPage() {
                 body: JSON.stringify({ new_password: newPassword })
             })
             if (response.ok) {
-                alert('Password berhasil direset!')
+                notify({ type: 'success', title: 'Password direset', message: 'Password user berhasil direset.' })
                 setShowResetPassword(null)
                 setNewPassword('')
             } else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Reset password gagal', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Reset password gagal', message: error.message })
         }
     }
 
@@ -102,10 +104,10 @@ function UsersPage() {
             if (response.ok) loadUsers()
             else {
                 const error = await response.json()
-                alert(error.detail)
+                notify({ type: 'error', title: 'Gagal mengubah status user', message: error.detail })
             }
         } catch (error) {
-            alert('Error: ' + error.message)
+            notify({ type: 'error', title: 'Gagal mengubah status user', message: error.message })
         }
     }
 
