@@ -19,11 +19,11 @@ type Config struct {
 func Load() Config {
 	dbPath := firstExistingPath(
 		os.Getenv("DB_PATH"),
+		filepath.Join("data", "kasir.db"),
 		"kasir.db",
-		filepath.Join("..", "backend", "kasir.db"),
 	)
 	if dbPath == "" {
-		dbPath = "kasir.db"
+		dbPath = filepath.Join("data", "kasir.db")
 	}
 
 	uploadDir := os.Getenv("UPLOAD_DIR")

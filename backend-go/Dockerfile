@@ -13,7 +13,7 @@ FROM debian:bookworm-slim
 WORKDIR /app
 
 ENV PORT=8000
-ENV DB_PATH=kasir.db
+ENV DB_PATH=data/kasir.db
 ENV UPLOAD_DIR=uploads
 
 COPY --from=builder /out/kasir-api /app/kasir-api

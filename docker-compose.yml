@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend-go
@@ -7,11 +5,11 @@ services:
     ports:
       - "8765:8000"
     volumes:
-      - ./backend/kasir.db:/app/kasir.db
-      - ./backend/uploads:/app/uploads
+      - ./backend-go/data:/app/data
+      - ./backend-go/uploads:/app/uploads
     environment:
       - PORT=8000
-      - DB_PATH=kasir.db
+      - DB_PATH=data/kasir.db
       - UPLOAD_DIR=uploads
     restart: unless-stopped
     networks:
@@ -31,7 +29,3 @@ services:
 networks:
   kasir-network:
     driver: bridge
-
-volumes:
-  db-data:
-  uploads-data:
