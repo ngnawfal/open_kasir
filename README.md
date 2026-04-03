@@ -156,10 +156,11 @@ Backend akan berjalan di: **http://localhost:8000**
 
 ### 📌 Status Migrasi Backend
 
-Backend aktif sekarang sudah disiapkan di folder **`backend-go/`**.
+Backend aktif sekarang sepenuhnya berada di folder **`backend-go/`**.
 
 - `backend-go/` → backend Go baru
-- `backend/` → backend Python lama yang dipertahankan sebagai referensi + sumber data SQLite lama
+- `backend-go/data/kasir.db` → database SQLite aktif
+- `backend-go/uploads/` → aset upload aktif
 
 Lihat detail migrasi, asumsi kompatibilitas, hasil verifikasi, dan langkah cutover di:
 
@@ -207,14 +208,12 @@ Buka browser dan akses: **http://localhost:5173** (development) atau **http://lo
 program_kasir/
 ├── backend-go/             # Go backend replacement
 │   ├── cmd/server/         # Entry point
+│   ├── data/               # SQLite database aktif
 │   ├── internal/           # API, config, db, models, handlers
-│   ├── uploads/            # Upload directory for local dev
+│   ├── uploads/            # Product images / uploaded assets
+│   ├── .env.example        # Template environment variables
 │   ├── go.mod              # Go module definition
 │   └── Dockerfile          # Container build for backend
-│
-├── backend/                # Legacy Python backend reference + existing SQLite data
-│   ├── kasir.db            # SQLite database with demo data
-│   └── uploads/            # Product images / persisted assets
 │
 ├── frontend/               # React + Vite Frontend
 │   ├── package.json       # Node.js dependencies

@@ -2,17 +2,20 @@
 
 ## Ringkasan
 
-Backend proyek ini sudah mulai dipindahkan dari Python/FastAPI ke **Go** dengan target utama:
+Backend proyek ini sudah dipindahkan dari Python/FastAPI ke **Go** dengan target utama:
 
 1. mempertahankan kontrak API frontend yang sudah ada,
 2. tetap memakai database SQLite lama,
 3. meminimalkan perubahan di frontend,
-4. memperbaiki beberapa bug bisnis penting di backend lama.
+4. memperbaiki beberapa bug bisnis penting dari implementasi lama.
 
-Folder yang dipakai sekarang:
+Lokasi yang dipakai sekarang:
 
-- `backend-go/` → implementasi backend Go baru
-- `backend/` → backend Python lama + file data lama (`kasir.db`, `uploads/`)
+- `backend-go/` → implementasi backend Go aktif
+- `backend-go/data/kasir.db` → database SQLite aktif
+- `backend-go/uploads/` → lokasi upload aktif
+
+Source backend Python lama sudah dihapus dari tree utama proyek setelah data dan asetnya dipindahkan.
 
 ## Arsitektur yang Dipilih
 
@@ -55,7 +58,7 @@ Target kompatibilitas saat migrasi:
 Selain migrasi bahasa, ada beberapa perbaikan penting yang sekaligus dimasukkan:
 
 1. **Kompatibilitas password hash lama**
-   - user lama di `backend/kasir.db` memakai `passlib pbkdf2_sha256`
+   - user lama di `backend-go/data/kasir.db` memakai `passlib pbkdf2_sha256`
    - backend Go sekarang bisa memverifikasi hash lama tersebut
 
 2. **`cost_total` transaksi dihitung saat checkout**
@@ -66,9 +69,9 @@ Selain migrasi bahasa, ada beberapa perbaikan penting yang sekaligus dimasukkan:
    - quantity transaksi harus > 0
    - harga, stok, min stock, poin, dan nilai diskon divalidasi lebih ketat
 
-4. **Bootstrap database aman untuk DB lama**
+4. **Bootstrap database aman untuk DB yang sudah ada**
    - backend Go tidak lagi memaksa `AutoMigrate` ke database lama yang sudah ada
-   - ini mencegah kerusakan schema lama saat startup
+   - ini mencegah kerusakan schema saat startup
 
 ## Hasil Verifikasi
 
@@ -91,7 +94,7 @@ Hasil: **0 diagnostics**
 
 ### 3. Smoke test backend Go
 
-Pengujian dilakukan memakai **copy database sementara**, supaya `backend/kasir.db` utama tidak berubah.
+Pengujian dilakukan memakai **copy database sementara**, supaya `backend-go/data/kasir.db` utama tidak berubah.
 
 Route penting yang diuji:
 
@@ -131,7 +134,7 @@ go run ./cmd/server
 Default:
 
 - port: `8000`
-- database: akan mencoba memakai DB lama jika tersedia
+- database default: `data/kasir.db`
 - uploads: folder `uploads/`
 
 ### Environment Variable yang Didukung
@@ -146,8 +149,8 @@ Contoh:
 
 ```bash
 PORT=8000
-DB_PATH=../backend/kasir.db
-UPLOAD_DIR=../backend/uploads
+DB_PATH=data/kasir.db
+UPLOAD_DIR=uploads
 JWT_SECRET=ubah-secret-anda
 ```
 
@@ -158,12 +161,12 @@ JWT_SECRET=ubah-secret-anda
 Service backend sekarang:
 
 - build context: `./backend-go`
-- mount database lama: `./backend/kasir.db:/app/kasir.db`
-- mount uploads lama: `./backend/uploads:/app/uploads`
+- mount database aktif: `./backend-go/data:/app/data`
+- mount uploads aktif: `./backend-go/uploads:/app/uploads`
 
-## Langkah Cutover yang Disarankan
+## Langkah Verifikasi yang Disarankan
 
-Sebelum benar-benar meninggalkan backend Python lama:
+Setelah cleanup backend Python lama:
 
 1. jalankan frontend melawan backend Go,
 2. uji login admin/kasir,
@@ -171,7 +174,7 @@ Sebelum benar-benar meninggalkan backend Python lama:
 4. uji halaman admin: produk, diskon, users, report,
 5. uji upload gambar produk,
 6. uji export CSV/Excel,
-7. backup `backend/kasir.db` sebelum deployment.
+7. backup `backend-go/data/kasir.db` sebelum deployment.
 
 ## Remaining Gap / Catatan
 
@@ -179,7 +182,7 @@ Beberapa hal masih perlu diuji lebih jauh secara manual di UI:
 
 - seluruh flow customer debt/hutang di frontend
 - upload gambar produk dari halaman admin
-- semua export format dibandingkan 1:1 dengan backend lama
-- konsistensi route yang sebelumnya duplikat di backend Python
+- semua export format dibandingkan 1:1 dengan perilaku versi lama
+- konsistensi route hasil konsolidasi dari backend lama
 
-Selain itu, meskipun backend Go sudah bisa jalan, **ini tetap migrasi besar**, jadi validasi manual end-to-end di browser tetap penting sebelum backend Python lama benar-benar dibuang.
+Meskipun source backend Python lama sudah dibersihkan, ini tetap migrasi besar. Validasi manual end-to-end di browser tetap penting sebelum deployment final.
