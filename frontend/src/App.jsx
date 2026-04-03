@@ -1,9 +1,12 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { UIProvider, useUI } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import PageLoading from './components/common/PageLoading'
+import RequireAuth from './components/routing/RequireAuth'
+import RequireAdmin from './components/routing/RequireAdmin'
 import { ROUTES, getPageKeyFromPath } from './config/routes'
 
 const LoginPage = lazy(() => import('./pages/LoginPage'))
@@ -22,6 +25,7 @@ function PageFallback() {
 
 function AuthenticatedShell() {
     const location = useLocation()
+    const { notify } = useUI()
     const [cart, setCart] = useState([])
     const [products, setProducts] = useState([])
     const currentPage = getPageKeyFromPath(location.pathname)
@@ -54,7 +58,7 @@ function AuthenticatedShell() {
                 const currentQty = existingItem.quantity
                 const availableStock = product.stock
                 if (currentQty >= availableStock) {
-                    alert(`Stok ${product.name} tidak cukup! Tersedia: ${availableStock}`)
+                    notify({ type: 'warning', title: 'Stok tidak cukup', message: `${product.name} tersisa ${availableStock}` })
                     return prevCart
                 }
                 return prevCart.map(item =>
@@ -80,7 +84,7 @@ function AuthenticatedShell() {
 
                     // Check if new quantity exceeds stock
                     if (product && newQuantity > product.stock) {
-                        alert(`Stok ${product.name} tidak cukup! Maksimal: ${product.stock}`)
+                        notify({ type: 'warning', title: 'Stok tidak cukup', message: `${product.name} maksimal ${product.stock}` })
                         return item // Keep current quantity
                     }
 
@@ -96,15 +100,6 @@ function AuthenticatedShell() {
     const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
-    // Show loading
-    if (loading) {
-        return (
-            <div className="app app-loading-shell">
-                <div className="spinner"></div>
-            </div>
-        )
-    }
-
     return (
         <div className="app">
             <Header
@@ -117,13 +112,13 @@ function AuthenticatedShell() {
                     <Suspense fallback={<PageFallback />}>
                         <Routes>
                             <Route path={ROUTES.cashier} element={<CashierPage products={products} cart={cart} cartTotal={cartTotal} cartCount={cartCount} addToCart={addToCart} updateQuantity={updateQuantity} clearCart={clearCart} fetchProducts={fetchProducts} />} />
-                            <Route path={ROUTES.products} element={<AdminPage products={products} onProductsChange={fetchProducts} />} />
-                            <Route path={ROUTES.inventory} element={<InventoryPage />} />
-                            <Route path={ROUTES.discounts} element={<DiscountsPage />} />
-                            <Route path={ROUTES.reports} element={<ReportsPage />} />
+                            <Route path={ROUTES.products} element={<RequireAdmin><AdminPage products={products} onProductsChange={fetchProducts} /></RequireAdmin>} />
+                            <Route path={ROUTES.inventory} element={<RequireAdmin><InventoryPage /></RequireAdmin>} />
+                            <Route path={ROUTES.discounts} element={<RequireAdmin><DiscountsPage /></RequireAdmin>} />
+                            <Route path={ROUTES.reports} element={<RequireAdmin><ReportsPage /></RequireAdmin>} />
                             <Route path={ROUTES.history} element={<HistoryPage />} />
-                            <Route path={ROUTES.customers} element={<CustomersPage />} />
-                            <Route path={ROUTES.users} element={<UsersPage />} />
+                            <Route path={ROUTES.customers} element={<RequireAdmin><CustomersPage /></RequireAdmin>} />
+                            <Route path={ROUTES.users} element={<RequireAdmin><UsersPage /></RequireAdmin>} />
                             <Route path="*" element={<Navigate to={ROUTES.cashier} replace />} />
                         </Routes>
                     </Suspense>
@@ -146,10 +141,9 @@ function AppContent() {
                 path={ROUTES.login}
                 element={isAuthenticated ? <Navigate to={ROUTES.cashier} replace /> : <Suspense fallback={<PageFallback />}><LoginPage /></Suspense>}
             />
-            <Route
-                path="/*"
-                element={isAuthenticated ? <AuthenticatedShell /> : <Navigate to={ROUTES.login} replace />}
-            />
+            <Route element={<RequireAuth />}>
+                <Route path="/*" element={<AuthenticatedShell />} />
+            </Route>
         </Routes>
     )
 }
@@ -158,9 +152,11 @@ function App() {
     return (
         <ThemeProvider>
             <AuthProvider>
-                <BrowserRouter>
-                    <AppContent />
-                </BrowserRouter>
+                <UIProvider>
+                    <BrowserRouter>
+                        <AppContent />
+                    </BrowserRouter>
+                </UIProvider>
             </AuthProvider>
         </ThemeProvider>
     )
