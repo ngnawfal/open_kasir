@@ -93,98 +93,64 @@ function ReportsPage() {
     }
 
     return (
-        <div className="page-container">
+        <div className="page-container admin-page-shell reports-page-shell">
             <PageTitle
                 title="Laporan & Analitik"
                 subtitle="Dashboard laporan keuangan dan performa bisnis"
             />
 
-            {/* Summary Cards */}
             {summary && (
-                <div className="grid grid-cols-4 mb-6">
-                    <div className="card">
-                        <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Hari Ini</div>
-                        <div style={{ fontSize: '28px', fontWeight: '700', color: '#10b981', marginBottom: '4px' }}>
+                <div className="dashboard-stats-grid reports-summary mb-6">
+                    <div className="card admin-stat-card">
+                        <div className="admin-stat-label">Hari Ini</div>
+                        <div className="admin-stat-value success">
                             {formatRupiah(summary.today.sales)}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#9ca3af' }}>{summary.today.transactions} transaksi</div>
+                        <div className="admin-stat-sub">{summary.today.transactions} transaksi</div>
                     </div>
-                    <div className="card">
-                        <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Bulan Ini</div>
-                        <div style={{ fontSize: '28px', fontWeight: '700', color: '#4f46e5', marginBottom: '4px' }}>
+                    <div className="card admin-stat-card">
+                        <div className="admin-stat-label">Bulan Ini</div>
+                        <div className="admin-stat-value primary">
                             {formatRupiah(summary.this_month.sales)}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#9ca3af' }}>{summary.this_month.transactions} transaksi</div>
+                        <div className="admin-stat-sub">{summary.this_month.transactions} transaksi</div>
                     </div>
-                    <div className="card">
-                        <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Produk</div>
-                        <div style={{ fontSize: '32px', fontWeight: '700', color: '#3b82f6', marginBottom: '4px' }}>
+                    <div className="card admin-stat-card">
+                        <div className="admin-stat-label">Produk</div>
+                        <div className="admin-stat-value accent">
                             {summary.products.total}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#9ca3af' }}>{summary.products.low_stock} stok rendah</div>
+                        <div className="admin-stat-sub">{summary.products.low_stock} stok rendah</div>
                     </div>
-                    <div className="card">
-                        <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>Promo Aktif</div>
-                        <div style={{ fontSize: '32px', fontWeight: '700', color: '#f59e0b', marginBottom: '4px' }}>
+                    <div className="card admin-stat-card">
+                        <div className="admin-stat-label">Promo Aktif</div>
+                        <div className="admin-stat-value warning">
                             {summary.discounts.active}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#9ca3af' }}>diskon</div>
+                        <div className="admin-stat-sub">diskon</div>
                     </div>
                 </div>
             )}
 
-            {/* Excel Export Section */}
-            <div className="card mb-6" style={{ padding: '20px' }}>
-                <div style={{ marginBottom: '16px' }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '4px' }}>
+            <div className="card admin-surface-card export-panel mb-6">
+                <div className="export-panel-copy">
+                    <h3 className="export-panel-title">
                         📊 Export Laporan Excel
                     </h3>
-                    <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                    <p className="export-panel-subtitle">
                         Laporan profesional dengan grafik, analitik, dan formatting otomatis
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div className="export-panel-actions">
                     <button
+                        className="export-button finance"
                         onClick={() => exportExcel('/api/export/excel/transactions', `laporan_keuangan_${new Date().toISOString().split('T')[0]}.xlsx`)}
-                        style={{
-                            padding: '12px 24px',
-                            background: 'linear-gradient(135deg, #10b981, #059669)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '10px',
-                            fontSize: '15px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                     >
                         💼 Laporan Keuangan
                     </button>
                     <button
+                        className="export-button inventory"
                         onClick={() => exportExcel('/api/export/excel/products', `inventori_lengkap_${new Date().toISOString().split('T')[0]}.xlsx`)}
-                        style={{
-                            padding: '12px 24px',
-                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '10px',
-                            fontSize: '15px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                     >
                         📦 Laporan Inventori
                     </button>

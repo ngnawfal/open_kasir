@@ -86,56 +86,46 @@ function InventoryPage() {
     }
 
     return (
-        <div className="page-container">
+        <div className="page-container admin-page-shell inventory-page-shell">
             <PageTitle
                 title="Manajemen Stok"
                 subtitle="Kelola stok produk Anda dengan mudah"
             />
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-4 mb-6">
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#4f46e5', marginBottom: '8px' }}>
+            <div className="dashboard-stats-grid inventory-stats-grid mb-6">
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value primary">
                         {products.length}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Produk</div>
+                    <div className="admin-stat-label">Total Produk</div>
                 </div>
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#10b981', marginBottom: '8px' }}>
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value success">
                         {totalStock}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Total Stok</div>
+                    <div className="admin-stat-label">Total Stok</div>
                 </div>
-                <div className="card" onClick={() => setFilter('low')} style={{ cursor: 'pointer' }}>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px' }}>
+                <div className="card admin-stat-card is-clickable" onClick={() => setFilter('low')}>
+                    <div className="admin-stat-value warning">
                         {lowStockCount}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Stok Rendah</div>
+                    <div className="admin-stat-label">Stok Rendah</div>
                 </div>
-                <div className="card" onClick={() => setFilter('out')} style={{ cursor: 'pointer' }}>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#ef4444', marginBottom: '8px' }}>
+                <div className="card admin-stat-card is-clickable" onClick={() => setFilter('out')}>
+                    <div className="admin-stat-value danger">
                         {outOfStockCount}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Stok Habis</div>
+                    <div className="admin-stat-label">Stok Habis</div>
                 </div>
             </div>
 
-            {/* Low Stock Alert */}
             {lowStockCount > 0 && (
-                <div style={{
-                    padding: '12px 16px',
-                    background: '#fef3c7',
-                    border: '1px solid #f59e0b',
-                    borderRadius: '10px',
-                    marginBottom: '24px',
-                    color: '#92400e'
-                }}>
+                <div className="admin-alert-banner warning mb-6">
                     <strong>⚠️ Peringatan:</strong> {lowStockCount} produk stok rendah
                 </div >
             )}
 
-            {/* Filter Buttons */}
-            <div className="flex gap-2 mb-6">
+            <div className="admin-filter-bar mb-6">
                 {[
                     { id: 'all', label: 'Semua' },
                     { id: 'low', label: '⚠️ Rendah' },
@@ -151,49 +141,34 @@ function InventoryPage() {
                 ))}
             </div>
 
-            {/* Products List - Redesigned */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="inventory-list-stack">
                 {filteredProducts.map(product => (
-                    <div key={product.id} className="card" style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '16px'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                    <div key={product.id} className="card inventory-list-item">
+                        <div className="inventory-item-main">
                             {product.image_url ? (
                                 <img
                                     src={product.image_url}
                                     alt={product.name}
-                                    style={{
-                                        width: '60px',
-                                        height: '60px',
-                                        objectFit: 'cover',
-                                        borderRadius: '10px'
-                                    }}
+                                    className="inventory-item-image"
                                 />
                             ) : (
-                                <span style={{ fontSize: '40px' }}>{product.emoji}</span>
+                                <span className="inventory-item-emoji">{product.emoji}</span>
                             )}
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '4px' }}>
+                            <div className="inventory-item-copy">
+                                <div className="inventory-item-name">
                                     {product.name}
                                 </div>
-                                <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                                <div className="inventory-item-meta">
                                     {product.category} • {formatRupiah(product.price)}
                                 </div>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                    fontSize: '24px',
-                                    fontWeight: '700',
-                                    color: product.stock === 0 ? '#ef4444' : product.stock <= 5 ? '#f59e0b' : '#10b981'
-                                }}>
+                        <div className="inventory-item-side">
+                            <div className="inventory-stock-pill">
+                                <div className={`inventory-stock-value ${product.stock === 0 ? 'danger' : product.stock <= 5 ? 'warning' : 'success'}`}>
                                     {product.stock}
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#6b7280' }}>stok</div>
+                                <div className="inventory-stock-label">stok</div>
                             </div>
                             <button
                                 className="btn-primary btn-sm"

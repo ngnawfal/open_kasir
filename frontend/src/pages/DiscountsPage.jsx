@@ -143,107 +143,46 @@ function DiscountsPage() {
     }
 
     return (
-        <div className="page-container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <div className="page-container admin-page-shell discounts-page-shell">
+            <div className="admin-toolbar">
                 <PageTitle
                     title="Manajemen Diskon & Promo"
                     subtitle="Kelola kode promo dan penawaran spesial"
                 />
                 <button
                     onClick={() => setShowForm(true)}
-                    style={{
-                        padding: '10px 20px',
-                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '15px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        whiteSpace: 'nowrap',
-                        transition: 'all 0.2s',
-                        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                    }}
-                    onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                    onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                    className="admin-toolbar-action warning"
                 >
                     🏷️ Tambah Diskon
                 </button>
             </div>
 
-            {/* Discounts Grid */}
             {discounts.length === 0 ? (
-                <div className="card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-                    <span style={{ fontSize: '64px', opacity: 0.3 }}>🏷️</span>
-                    <p style={{ color: '#6b7280', marginTop: '16px' }}>Belum ada diskon atau promo</p>
+                <div className="card admin-empty-state">
+                    <span className="admin-empty-icon">🏷️</span>
+                    <p>Belum ada diskon atau promo</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
+                <div className="discount-grid admin-coupon-grid">
                     {discounts.map(discount => (
                         <div
                             key={discount.id}
-                            style={{
-                                background: discount.is_active
-                                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                    : 'linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)',
-                                borderRadius: '16px',
-                                padding: '24px',
-                                color: 'white',
-                                position: 'relative',
-                                overflow: 'hidden',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                                transition: 'transform 0.2s',
-                                opacity: discount.is_active ? 1 : 0.7
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            className={`discount-card admin-coupon-card ${discount.is_active ? 'active' : 'inactive'}`}
                         >
-                            {/* Big Discount Badge */}
-                            <div style={{
-                                position: 'absolute',
-                                top: '-10px',
-                                right: '-10px',
-                                width: '100px',
-                                height: '100px',
-                                background: 'rgba(255,255,255,0.2)',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '32px',
-                                fontWeight: '800',
-                                backdropFilter: 'blur(10px)'
-                            }}>
+                            <div className="admin-coupon-badge">
                                 {discount.discount_type === 'percentage' ? `${discount.value}%` : '💰'}
                             </div>
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{
-                                    fontSize: '24px',
-                                    fontWeight: '700',
-                                    marginBottom: '8px',
-                                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                }}>
+                            <div className="admin-coupon-head">
+                                <div className="admin-coupon-title">
                                     {discount.name}
                                 </div>
-                                <div style={{
-                                    fontFamily: 'monospace',
-                                    fontSize: '18px',
-                                    background: 'rgba(255,255,255,0.2)',
-                                    padding: '6px 12px',
-                                    borderRadius: '8px',
-                                    display: 'inline-block',
-                                    fontWeight: '600',
-                                    backdropFilter: 'blur(10px)'
-                                }}>
+                                <div className="admin-coupon-code">
                                     {discount.code}
                                 </div>
                             </div>
 
-                            <div style={{ fontSize: '14px', marginBottom: '16px', opacity: 0.9 }}>
+                            <div className="admin-coupon-meta">
                                 <div>💵 {discount.discount_type === 'percentage'
                                     ? `Diskon ${discount.value}%`
                                     : `Potongan ${formatRupiah(discount.value)}`}
@@ -260,53 +199,22 @@ function DiscountsPage() {
                                 )}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                            <div className="admin-coupon-actions">
                                 <button
                                     onClick={() => toggleActive(discount)}
-                                    style={{
-                                        flex: 1,
-                                        padding: '8px 16px',
-                                        background: 'rgba(255,255,255,0.2)',
-                                        color: 'white',
-                                        border: '1px solid rgba(255,255,255,0.3)',
-                                        borderRadius: '8px',
-                                        fontSize: '13px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        backdropFilter: 'blur(10px)',
-                                        transition: 'all 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
-                                    onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+                                    className="admin-coupon-action primary"
                                 >
                                     {discount.is_active ? '❌ Nonaktifkan' : '✅ Aktifkan'}
                                 </button>
                                 <button
                                     onClick={() => handleEdit(discount)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        background: 'rgba(255,255,255,0.2)',
-                                        color: 'white',
-                                        border: '1px solid rgba(255,255,255,0.3)',
-                                        borderRadius: '8px',
-                                        fontSize: '13px',
-                                        cursor: 'pointer',
-                                        backdropFilter: 'blur(10px)'
-                                    }}
+                                    className="admin-coupon-action icon"
                                 >
                                     ✏️
                                 </button>
                                 <button
                                     onClick={() => handleDelete(discount.id)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        background: 'rgba(239, 68, 68, 0.8)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontSize: '13px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className="admin-coupon-action danger"
                                 >
                                     🗑️
                                 </button>

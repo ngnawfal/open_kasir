@@ -135,61 +135,44 @@ function UsersPage() {
     }
 
     return (
-        <div className="page-container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <div className="page-container admin-page-shell users-page-shell">
+            <div className="admin-toolbar">
                 <PageTitle
                     title="Manajemen User"
                     subtitle="Kelola akun kasir dan admin"
                 />
                 <button
                     onClick={() => setShowForm(true)}
-                    style={{
-                        padding: '10px 20px',
-                        background: '#4f46e5',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontSize: '15px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        whiteSpace: 'nowrap',
-                        transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.background = '#4338ca'}
-                    onMouseLeave={(e) => e.target.style.background = '#4f46e5'}
+                    className="admin-toolbar-action"
                 >
                     ➕ Tambah User
                 </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-4 mb-6">
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#4f46e5', marginBottom: '8px' }}>
+            <div className="dashboard-stats-grid mb-6">
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value primary">
                         {users.length}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Total User</div>
+                    <div className="admin-stat-label">Total User</div>
                 </div>
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#10b981', marginBottom: '8px' }}>
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value success">
                         {users.filter(u => u.is_active).length}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>User Aktif</div>
+                    <div className="admin-stat-label">User Aktif</div>
                 </div>
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px' }}>
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value warning">
                         {users.filter(u => u.role === 'admin').length}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Admin</div>
+                    <div className="admin-stat-label">Admin</div>
                 </div>
-                <div className="card">
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#3b82f6', marginBottom: '8px' }}>
+                <div className="card admin-stat-card">
+                    <div className="admin-stat-value accent">
                         {users.filter(u => u.role === 'kasir').length}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Kasir</div>
+                    <div className="admin-stat-label">Kasir</div>
                 </div>
             </div>
 
