@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { UIProvider, useUI } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -8,6 +8,8 @@ import PageLoading from './components/common/PageLoading'
 import RequireAuth from './components/routing/RequireAuth'
 import RequireAdmin from './components/routing/RequireAdmin'
 import { ROUTES, getPageKeyFromPath } from './config/routes'
+import { useProducts } from './hooks/useProducts'
+import { useCart } from './hooks/useCart'
 
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const CashierPage = lazy(() => import('./pages/CashierPage'))
@@ -26,8 +28,6 @@ function PageFallback() {
 function AuthenticatedShell() {
     const location = useLocation()
     const { notify } = useUI()
-    const [cart, setCart] = useState([])
-    const [products, setProducts] = useState([])
     const currentPage = getPageKeyFromPath(location.pathname)
 
     // Sidebar collapsed state - synced with Header
@@ -36,69 +36,8 @@ function AuthenticatedShell() {
         return saved === 'true'
     })
 
-    useEffect(() => {
-        fetchProducts()
-    }, [])
-
-    const fetchProducts = async () => {
-        try {
-            const response = await fetch('/api/products')
-            const data = await response.json()
-            setProducts(data)
-        } catch (error) {
-            console.error('Error fetching products:', error)
-        }
-    }
-
-    const addToCart = (product) => {
-        setCart(prevCart => {
-            const existingItem = prevCart.find(item => item.id === product.id)
-            if (existingItem) {
-                // Check stock
-                const currentQty = existingItem.quantity
-                const availableStock = product.stock
-                if (currentQty >= availableStock) {
-                    notify({ type: 'warning', title: 'Stok tidak cukup', message: `${product.name} tersisa ${availableStock}` })
-                    return prevCart
-                }
-                return prevCart.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                )
-            }
-            return [...prevCart, { ...product, quantity: 1 }]
-        })
-    }
-
-    const updateQuantity = (productId, newQuantity) => {
-        setCart(prevCart => {
-            // If quantity is 0 or less, remove item from cart
-            if (newQuantity <= 0) {
-                return prevCart.filter(item => item.id !== productId)
-            }
-
-            return prevCart.map(item => {
-                if (item.id === productId) {
-                    const product = products.find(p => p.id === productId)
-
-                    // Check if new quantity exceeds stock
-                    if (product && newQuantity > product.stock) {
-                        notify({ type: 'warning', title: 'Stok tidak cukup', message: `${product.name} maksimal ${product.stock}` })
-                        return item // Keep current quantity
-                    }
-
-                    return { ...item, quantity: newQuantity }
-                }
-                return item
-            })
-        })
-    }
-
-    const clearCart = () => setCart([])
-
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+    const { products, fetchProducts } = useProducts(true)
+    const { cart, addToCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart(products, notify)
 
     return (
         <div className="app">

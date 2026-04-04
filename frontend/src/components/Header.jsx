@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ROUTES, getNavItems } from '../config/routes'
 import {
     ShoppingCart,
@@ -26,7 +26,6 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
     const { user, logout, isAdmin } = useAuth()
     const { toggleTheme, isDark } = useTheme()
     const location = useLocation()
-    const navigate = useNavigate()
 
     // Mobile menu state
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -51,10 +50,7 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
 
     const navItems = getNavItems(isAdmin)
 
-    const handleNavClick = (path) => {
-        navigate(path)
-        setMobileMenuOpen(false) // Close mobile menu after navigation
-    }
+    const closeMobileMenu = () => setMobileMenuOpen(false)
 
     const toggleSidebar = () => {
         if (onSidebarToggle) {
@@ -72,12 +68,12 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
             <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 {/* Sidebar Header */}
                 <div className="sidebar-header">
-                    <div className="sidebar-logo clickable-logo" onClick={() => navigate(ROUTES.cashier)}>
+                    <Link className="sidebar-logo clickable-logo" to={ROUTES.cashier}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
                         />
-                    </div>
+                    </Link>
                     <button
                         className="sidebar-toggle-btn"
                         onClick={toggleSidebar}
@@ -92,10 +88,10 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
                     {navItems.map(item => {
                         const IconComponent = iconMap[item.icon]
                         return (
-                            <button
+                            <NavLink
                                 key={item.key}
-                                className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                                onClick={() => handleNavClick(item.path)}
+                                className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
+                                to={item.path}
                                 title={sidebarCollapsed ? item.label : ''}
                             >
                                 <span className="nav-icon">
@@ -105,7 +101,7 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
                                 {item.key === 'cashier' && cartCount > 0 && (
                                     <span className="cart-badge">{cartCount}</span>
                                 )}
-                            </button>
+                            </NavLink>
                         )
                     })}
                 </nav>
@@ -158,12 +154,12 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
                         <span className="hamburger-line"></span>
                     </button>
 
-                    <div className="logo clickable-logo" onClick={() => navigate(ROUTES.cashier)}>
+                    <Link className="logo clickable-logo" to={ROUTES.cashier}>
                         <img
                             src="/kasirzcuu-logo.svg"
                             alt="KasirzCuu"
                         />
-                    </div>
+                    </Link>
 
                     {cartCount > 0 && (
                         <div className="header-cart-badge">{cartCount}</div>
@@ -201,10 +197,11 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
                             {navItems.map(item => {
                                 const IconComponent = iconMap[item.icon]
                                 return (
-                                    <button
+                                    <NavLink
                                         key={item.key}
-                                        className={`mobile-menu-item ${location.pathname === item.path ? 'active' : ''}`}
-                                        onClick={() => handleNavClick(item.path)}
+                                        className={({ isActive }) => `mobile-menu-item ${isActive ? 'active' : ''}`}
+                                        to={item.path}
+                                        onClick={closeMobileMenu}
                                     >
                                         <span className="nav-icon">
                                             <IconComponent size={20} strokeWidth={2} />
@@ -213,7 +210,7 @@ function Header({ cartCount, sidebarCollapsed, onSidebarToggle }) {
                                         {item.key === 'cashier' && cartCount > 0 && (
                                             <span className="cart-badge">{cartCount}</span>
                                         )}
-                                    </button>
+                                    </NavLink>
                                 )
                             })}
                         </nav>
