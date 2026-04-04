@@ -6,6 +6,7 @@ import CustomersSummaryCards from '../components/customers/CustomersSummaryCards
 import CustomersToolbar from '../components/customers/CustomersToolbar'
 import CustomersTableSection from '../components/customers/CustomersTableSection'
 import CustomerFormModal from '../components/customers/CustomerFormModal'
+import { fetchCustomers, payCustomerDebt, saveCustomer } from '../services/customersApi'
 
 function CustomersPage() {
     const { authFetch } = useAuth()
@@ -30,13 +31,7 @@ function CustomersPage() {
     const loadCustomers = async () => {
         try {
             const url = showDebtOnly
-                ? '/api/customers?has_debt=true'
-                : '/api/customers'
-            const response = await authFetch(url)
-            if (response.ok) {
-                const data = await response.json()
-                setCustomers(data)
-            }
+            setCustomers(await fetchCustomers(authFetch, { hasDebt: showDebtOnly }))
         } catch (error) {
             console.error('Error:', error)
         } finally {
@@ -47,13 +42,7 @@ function CustomersPage() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const url = selectedCustomer
-                ? `/api/customers/${selectedCustomer.id}`
-                : '/api/customers'
-            const response = await authFetch(url, {
-                method: selectedCustomer ? 'PUT' : 'POST',
-                body: JSON.stringify(formData)
-            })
+            const response = await saveCustomer(authFetch, formData, selectedCustomer?.id)
             if (response.ok) {
                 loadCustomers()
                 resetForm()
@@ -94,10 +83,7 @@ function CustomersPage() {
         if (!amount) return
 
         try {
-            const response = await authFetch(`/api/customers/${customerId}/debts/${debtId}/pay`, {
-                method: 'POST',
-                body: JSON.stringify({ amount: parseInt(amount) })
-            })
+            const response = await payCustomerDebt(authFetch, customerId, debtId, parseInt(amount))
             if (response.ok) {
                 loadCustomers()
                 notify({ type: 'success', title: 'Pembayaran berhasil', message: 'Hutang pelanggan berhasil dibayar.' })

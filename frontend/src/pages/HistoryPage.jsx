@@ -5,6 +5,7 @@ import PageLoading from '../components/common/PageLoading'
 import HistorySummaryCards from '../components/history/HistorySummaryCards'
 import HistoryFiltersCard from '../components/history/HistoryFiltersCard'
 import TransactionHistoryList from '../components/history/TransactionHistoryList'
+import { fetchTransactions } from '../services/transactionsApi'
 
 function HistoryPage() {
     const { authFetch } = useAuth()
@@ -23,14 +24,7 @@ function HistoryPage() {
 
     const fetchTransactions = async () => {
         try {
-            let url = '/api/transactions?limit=100'
-            if (filter.payment_method) url += `&payment_method=${filter.payment_method}`
-            if (filter.date_from) url += `&date_from=${filter.date_from}`
-            if (filter.date_to) url += `&date_to=${filter.date_to}`
-
-            const response = await authFetch(url)
-            const data = await response.json()
-            setTransactions(data)
+            setTransactions(await fetchTransactions(authFetch, filter))
         } catch (error) {
             console.error('Error:', error)
         } finally {
