@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { loginRequest, authenticatedRequest } from '../services/authApi'
+import { clearStoredAuth, loadStoredAuth, saveStoredAuth } from '../services/authStorage'
 
 const AuthContext = createContext(null)
 
@@ -9,35 +11,21 @@ export function AuthProvider({ children }) {
 
     // Load from localStorage on mount
     useEffect(() => {
-        const savedToken = localStorage.getItem('token')
-        const savedUser = localStorage.getItem('user')
-
-        if (savedToken && savedUser) {
-            setToken(savedToken)
-            setUser(JSON.parse(savedUser))
+        const stored = loadStoredAuth()
+        if (stored.token && stored.user) {
+            setToken(stored.token)
+            setUser(stored.user)
         }
         setLoading(false)
     }, [])
 
     const login = async (username, password) => {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-
-        if (!response.ok) {
-            const error = await response.json()
-            throw new Error(error.detail || 'Login gagal')
-        }
-
-        const data = await response.json()
+        const data = await loginRequest(username, password)
 
         setToken(data.access_token)
         setUser(data.user)
 
-        localStorage.setItem('token', data.access_token)
-        localStorage.setItem('user', JSON.stringify(data.user))
+        saveStoredAuth(data.access_token, data.user)
 
         return data.user
     }
@@ -45,8 +33,7 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setToken(null)
         setUser(null)
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
+        clearStoredAuth()
     }
 
     const isAdmin = user?.role === 'admin'
@@ -55,24 +42,7 @@ export function AuthProvider({ children }) {
 
     // Helper for authenticated requests
     const authFetch = async (url, options = {}) => {
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`
-        }
-
-        const response = await fetch(url, { ...options, headers })
-
-        // Handle token expiry
-        if (response.status === 401) {
-            logout()
-            throw new Error('Sesi telah berakhir')
-        }
-
-        return response
+        return authenticatedRequest(url, token, logout, options)
     }
 
     const value = {
