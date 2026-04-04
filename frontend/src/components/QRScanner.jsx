@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
+import { loadHtml5QrCode } from '../services/scannerLoader'
 
 function QRScanner({ onScan, isScanning, setIsScanning }) {
     const scannerRef = useRef(null)
@@ -21,6 +21,7 @@ function QRScanner({ onScan, isScanning, setIsScanning }) {
             setError(null)
 
             if (!html5QrCodeRef.current) {
+                const Html5Qrcode = await loadHtml5QrCode()
                 html5QrCodeRef.current = new Html5Qrcode('qr-reader')
             }
 

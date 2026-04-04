@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { BrowserMultiFormatReader } from '@zxing/library'
+import { loadZxingReader } from '../services/scannerLoader'
 
 function BarcodeScanner({ onScan, isScanning, setIsScanning }) {
     const videoRef = useRef(null)
@@ -51,6 +51,7 @@ function BarcodeScanner({ onScan, isScanning, setIsScanning }) {
 
                 // Create reader
                 if (!readerRef.current) {
+                    const BrowserMultiFormatReader = await loadZxingReader()
                     readerRef.current = new BrowserMultiFormatReader()
                 }
 

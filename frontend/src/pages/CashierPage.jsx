@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import BarcodeScanner from '../components/BarcodeScanner'
+import { lazy, Suspense, useState } from 'react'
 import CheckoutModal from '../components/CheckoutModal'
 import { useAuth } from '../context/AuthContext'
+
+const BarcodeScanner = lazy(() => import('../components/BarcodeScanner'))
 
 function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQuantity, clearCart, fetchProducts }) {
     const { authFetch } = useAuth()
@@ -281,11 +282,13 @@ function CashierPage({ products, cart, cartTotal, cartCount, addToCart, updateQu
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <BarcodeScanner
-                                    onScan={handleScan}
-                                    isScanning={isScanning}
-                                    setIsScanning={setIsScanning}
-                                />
+                                <Suspense fallback={<div className="page-loading-state compact"><div className="spinner"></div></div>}>
+                                    <BarcodeScanner
+                                        onScan={handleScan}
+                                        isScanning={isScanning}
+                                        setIsScanning={setIsScanning}
+                                    />
+                                </Suspense>
                             </div>
                         </div>
                     </div>
