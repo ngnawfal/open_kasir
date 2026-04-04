@@ -6,6 +6,7 @@ import PageLoading from '../components/common/PageLoading'
 import DiscountsToolbar from '../components/discounts/DiscountsToolbar'
 import DiscountCardsGrid from '../components/discounts/DiscountCardsGrid'
 import DiscountFormModal from '../components/discounts/DiscountFormModal'
+import { deleteDiscount, fetchDiscountsPublic, saveDiscount, toggleDiscountStatus } from '../services/discountsApi'
 
 function DiscountsPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -31,9 +32,7 @@ function DiscountsPage() {
 
     const fetchDiscounts = async () => {
         try {
-            const response = await fetch('/api/discounts')
-            const data = await response.json()
-            setDiscounts(data)
+            setDiscounts(await fetchDiscountsPublic())
         } catch (error) {
             console.error('Error:', error)
         } finally {
@@ -47,23 +46,16 @@ function DiscountsPage() {
         e.preventDefault()
 
         try {
-            const url = selectedDiscount
-                ? `/api/discounts/${selectedDiscount.id}`
-                : '/api/discounts'
-
-            const response = await authFetch(url, {
-                method: selectedDiscount ? 'PUT' : 'POST',
-                body: JSON.stringify({
-                    code: formData.code,
-                    name: formData.name,
-                    discount_type: formData.discount_type,
-                    value: parseInt(formData.value),
-                    min_purchase: parseInt(formData.min_purchase) || 0,
-                    max_discount: formData.max_discount ? parseInt(formData.max_discount) : null,
-                    valid_until: formData.valid_until || null,
-                    usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null
-                })
-            })
+            const response = await saveDiscount(authFetch, {
+                code: formData.code,
+                name: formData.name,
+                discount_type: formData.discount_type,
+                value: parseInt(formData.value),
+                min_purchase: parseInt(formData.min_purchase) || 0,
+                max_discount: formData.max_discount ? parseInt(formData.max_discount) : null,
+                valid_until: formData.valid_until || null,
+                usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null
+            }, selectedDiscount?.id)
 
             if (response.ok) {
                 fetchDiscounts()
@@ -96,7 +88,7 @@ function DiscountsPage() {
         if (!(await confirm({ title: 'Hapus diskon?', description: 'Diskon yang dihapus tidak bisa dipakai lagi.', confirmText: 'Hapus', tone: 'danger' }))) return
 
         try {
-            const response = await authFetch(`/api/discounts/${id}`, { method: 'DELETE' })
+            const response = await deleteDiscount(authFetch, id)
             if (response.ok) {
                 fetchDiscounts()
             }
@@ -107,10 +99,7 @@ function DiscountsPage() {
 
     const toggleActive = async (discount) => {
         try {
-            const response = await authFetch(`/api/discounts/${discount.id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ is_active: !discount.is_active })
-            })
+            const response = await toggleDiscountStatus(authFetch, discount.id, !discount.is_active)
             if (response.ok) {
                 fetchDiscounts()
             }

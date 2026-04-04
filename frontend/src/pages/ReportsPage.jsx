@@ -10,6 +10,7 @@ import ReportsTabNav from '../components/reports/ReportsTabNav'
 import DailyReportPanel from '../components/reports/DailyReportPanel'
 import MonthlyReportPanel from '../components/reports/MonthlyReportPanel'
 import BestSellersPanel from '../components/reports/BestSellersPanel'
+import { exportReportFile, fetchDailyReport, fetchReportsBundle } from '../services/reportsApi'
 
 function ReportsPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -30,12 +31,7 @@ function ReportsPage() {
 
     const fetchReports = async () => {
         try {
-            const [summaryRes, dailyRes, monthlyRes, sellersRes] = await Promise.all([
-                authFetch('/api/reports/summary'),
-                authFetch(`/api/reports/daily?date=${selectedDate}`),
-                authFetch('/api/reports/monthly'),
-                authFetch('/api/reports/best-sellers')
-            ])
+            const { summaryRes, dailyRes, monthlyRes, sellersRes } = await fetchReportsBundle(authFetch, selectedDate)
 
             if (summaryRes.ok) setSummary(await summaryRes.json())
             if (dailyRes.ok) setDailyReport(await dailyRes.json())
@@ -50,7 +46,7 @@ function ReportsPage() {
 
     const fetchDailyReport = async (date) => {
         try {
-            const response = await authFetch(`/api/reports/daily?date=${date}`)
+            const response = await fetchDailyReport(authFetch, date)
             if (response.ok) {
                 setDailyReport(await response.json())
             }
@@ -66,7 +62,7 @@ function ReportsPage() {
 
     const exportExcel = async (endpoint, filename) => {
         try {
-            const response = await authFetch(endpoint)
+            const response = await exportReportFile(authFetch, endpoint)
             if (response.ok) {
                 const blob = await response.blob()
                 const url = window.URL.createObjectURL(blob)
