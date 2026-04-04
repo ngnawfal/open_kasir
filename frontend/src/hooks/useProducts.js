@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { fetchProductsPublic } from '../services/productsApi'
 
 export function useProducts(autoLoad = true) {
     const [products, setProducts] = useState([])
@@ -7,9 +8,7 @@ export function useProducts(autoLoad = true) {
     const fetchProducts = useCallback(async () => {
         setLoadingProducts(true)
         try {
-            const response = await fetch('/api/products')
-            const data = await response.json()
-            setProducts(data)
+            setProducts(await fetchProductsPublic())
         } catch (error) {
             console.error('Error fetching products:', error)
         } finally {

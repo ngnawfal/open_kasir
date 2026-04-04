@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { loadZxingReader } from '../services/scannerLoader'
+import {
+    createProductBarcode,
+    deleteProduct,
+    deleteProductBarcode,
+    deleteProductImage,
+    fetchProductBarcodes,
+    saveProduct,
+    uploadProductImage,
+} from '../services/productsApi'
 
 export function useAdminProducts({ products, onProductsChange, authFetch, notify, confirm }) {
     const [showForm, setShowForm] = useState(false)
@@ -123,19 +132,16 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
         e.preventDefault()
         try {
             const url = selectedProduct ? `/api/products/${selectedProduct.id}` : '/api/products'
-            const response = await authFetch(url, {
-                method: selectedProduct ? 'PUT' : 'POST',
-                body: JSON.stringify({
-                    barcode: formData.barcode || null,
-                    name: formData.name,
-                    price: parseInt(formData.price),
-                    cost_price: parseInt(formData.cost_price) || 0,
-                    stock: parseInt(formData.stock) || 0,
-                    min_stock: parseInt(formData.min_stock) || 5,
-                    category: formData.category,
-                    emoji: formData.emoji
-                })
-            })
+            const response = await saveProduct(authFetch, {
+                barcode: formData.barcode || null,
+                name: formData.name,
+                price: parseInt(formData.price),
+                cost_price: parseInt(formData.cost_price) || 0,
+                stock: parseInt(formData.stock) || 0,
+                min_stock: parseInt(formData.min_stock) || 5,
+                category: formData.category,
+                emoji: formData.emoji
+            }, selectedProduct?.id)
 
             if (response.ok) {
                 const result = await response.json()
@@ -156,7 +162,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
     const handleDelete = async (productId) => {
         if (!(await confirm({ title: 'Hapus produk?', description: 'Produk yang dihapus tidak akan tampil di daftar aktif.', confirmText: 'Hapus', tone: 'danger' }))) return
         try {
-            const response = await authFetch(`/api/products/${productId}`, { method: 'DELETE' })
+            const response = await deleteProduct(authFetch, productId)
             if (response.ok) onProductsChange()
         } catch (error) {
             console.error('Error:', error)
@@ -171,7 +177,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
         setUsbScanMode(false)
         setScannedBarcodes([])
         try {
-            const response = await authFetch(`/api/products/${product.id}/barcodes`)
+            const response = await fetchProductBarcodes(authFetch, product.id)
             if (response.ok) setProductBarcodes(await response.json())
         } catch (error) {
             console.error('Error loading barcodes:', error)
@@ -187,14 +193,11 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
         lastBatchScanTimeRef.current = now
 
         try {
-            const response = await authFetch(`/api/products/${product.id}/barcodes`, {
-                method: 'POST',
-                body: JSON.stringify({ barcode, description: 'Dari batch scan' })
-            })
+            const response = await createProductBarcode(authFetch, product.id, { barcode, description: 'Dari batch scan' })
 
             if (response.ok) {
                 setScannedBarcodes((prev) => [...prev, barcode])
-                const refreshResp = await authFetch(`/api/products/${product.id}/barcodes`)
+                const refreshResp = await fetchProductBarcodes(authFetch, product.id)
                 if (refreshResp.ok) setProductBarcodes(await refreshResp.json())
                 onProductsChange()
             }
@@ -206,10 +209,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
     const addBarcodeAlias = async () => {
         if (!newBarcodeInput.trim() || !showBarcodeModal) return
         try {
-            const response = await authFetch(`/api/products/${showBarcodeModal.id}/barcodes`, {
-                method: 'POST',
-                body: JSON.stringify({ barcode: newBarcodeInput.trim(), description: newBarcodeDesc.trim() || null })
-            })
+            const response = await createProductBarcode(authFetch, showBarcodeModal.id, { barcode: newBarcodeInput.trim(), description: newBarcodeDesc.trim() || null })
             if (response.ok) {
                 openBarcodeModal(showBarcodeModal)
                 setNewBarcodeInput('')
@@ -227,7 +227,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
     const deleteBarcodeAlias = async (barcodeId) => {
         if (!showBarcodeModal) return
         try {
-            const response = await authFetch(`/api/products/${showBarcodeModal.id}/barcodes/${barcodeId}`, { method: 'DELETE' })
+            const response = await deleteProductBarcode(authFetch, showBarcodeModal.id, barcodeId)
             if (response.ok) {
                 openBarcodeModal(showBarcodeModal)
                 onProductsChange()
@@ -293,11 +293,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
             const uploadFormData = new FormData()
             uploadFormData.append('file', file)
             const token = localStorage.getItem('token')
-            const response = await fetch(`/api/products/${productId}/upload-image`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
-                body: uploadFormData
-            })
+            const response = await uploadProductImage(token, productId, file)
             if (response.ok) {
                 onProductsChange()
                 notify({ type: 'success', title: 'Upload berhasil', message: 'Gambar produk berhasil diperbarui' })
@@ -315,7 +311,7 @@ export function useAdminProducts({ products, onProductsChange, authFetch, notify
     const handleDeleteImage = async (productId) => {
         if (!(await confirm({ title: 'Hapus gambar?', description: 'Gambar produk akan dihapus permanen.', confirmText: 'Hapus', tone: 'danger' }))) return
         try {
-            const response = await authFetch(`/api/products/${productId}/image`, { method: 'DELETE' })
+            const response = await deleteProductImage(authFetch, productId)
             if (response.ok) onProductsChange()
         } catch (error) {
             console.error('Error:', error)

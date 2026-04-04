@@ -4,6 +4,7 @@ import { useUI } from '../context/UIContext'
 import { PageTitle } from '../components/PageTitle'
 import AccessDenied from '../components/common/AccessDenied'
 import PageLoading from '../components/common/PageLoading'
+import { fetchProductsPublic, updateProductStock } from '../services/productsApi'
 
 function InventoryPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -22,9 +23,7 @@ function InventoryPage() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('/api/products')
-            const data = await response.json()
-            setProducts(data)
+            setProducts(await fetchProductsPublic())
         } catch (error) {
             console.error('Error:', error)
         } finally {
@@ -55,12 +54,9 @@ function InventoryPage() {
         if (!adjustQuantity) return
 
         try {
-            const response = await authFetch(`/api/products/${selectedProduct.id}/stock`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    quantity: parseInt(adjustQuantity),
-                    reason: adjustReason
-                })
+            const response = await updateProductStock(authFetch, selectedProduct.id, {
+                quantity: parseInt(adjustQuantity),
+                reason: adjustReason
             })
 
             if (response.ok) {
