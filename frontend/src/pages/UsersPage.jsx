@@ -8,6 +8,7 @@ import UsersSummaryCards from '../components/users/UsersSummaryCards'
 import UsersTableSection from '../components/users/UsersTableSection'
 import UserFormModal from '../components/users/UserFormModal'
 import ResetPasswordModal from '../components/users/ResetPasswordModal'
+import { fetchUsers, resetUserPassword, saveUser, updateUserStatus } from '../services/usersApi'
 
 function UsersPage() {
     const { authFetch, isAdmin } = useAuth()
@@ -31,11 +32,7 @@ function UsersPage() {
 
     const loadUsers = async () => {
         try {
-            const response = await authFetch('/api/users')
-            if (response.ok) {
-                const data = await response.json()
-                setUsers(data)
-            }
+            setUsers(await fetchUsers(authFetch))
         } catch (error) {
             console.error('Error:', error)
         } finally {
@@ -46,10 +43,6 @@ function UsersPage() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const url = selectedUser
-                ? `/api/users/${selectedUser.id}`
-                : '/api/users'
-
             const body = selectedUser
                 ? {
                     username: formData.username,
@@ -58,10 +51,7 @@ function UsersPage() {
                 }
                 : formData
 
-            const response = await authFetch(url, {
-                method: selectedUser ? 'PUT' : 'POST',
-                body: JSON.stringify(body)
-            })
+            const response = await saveUser(authFetch, body, selectedUser?.id)
 
             if (response.ok) {
                 loadUsers()
@@ -78,10 +68,7 @@ function UsersPage() {
     const handleResetPassword = async (e) => {
         e.preventDefault()
         try {
-            const response = await authFetch(`/api/users/${showResetPassword.id}/reset-password`, {
-                method: 'POST',
-                body: JSON.stringify({ new_password: newPassword })
-            })
+            const response = await resetUserPassword(authFetch, showResetPassword.id, newPassword)
             if (response.ok) {
                 notify({ type: 'success', title: 'Password direset', message: 'Password user berhasil direset.' })
                 setShowResetPassword(null)
@@ -97,10 +84,7 @@ function UsersPage() {
 
     const toggleUserStatus = async (user) => {
         try {
-            const response = await authFetch(`/api/users/${user.id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ is_active: !user.is_active })
-            })
+            const response = await updateUserStatus(authFetch, user.id, !user.is_active)
             if (response.ok) loadUsers()
             else {
                 const error = await response.json()
